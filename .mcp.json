@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "type": "local",
+      "command": ["bunx", "--bun", "shadcn@latest", "mcp"],
+      "enabled": true
+    }
+  }
+}
