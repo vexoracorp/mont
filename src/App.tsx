@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { motion, useInView, AnimatePresence } from "motion/react"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronRight, Clock, MessageSquare, Moon, Zap, X, Check, Minus, FileText, Code2, Plug, ArrowRight } from "lucide-react"
@@ -50,17 +51,17 @@ function Navbar() {
           >
             API
           </a>
-          <a
-            href="#"
+          <Link
+            to="/login"
             className="rounded-full px-3 py-1.5 text-[13px] text-[#999999] transition-colors hover:text-white"
           >
             Login
-          </a>
+          </Link>
         </div>
 
-        <button className="ml-1 shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-[#918DF6] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#9580FF]">
+        <Link to="/signup" className="ml-1 shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-[#918DF6] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#9580FF]">
           Start free trial
-        </button>
+        </Link>
       </div>
     </nav>
   )

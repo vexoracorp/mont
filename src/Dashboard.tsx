@@ -11,6 +11,8 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
+  Calendar,
+  ArrowRight,
 } from "lucide-react"
 import {
   AreaChart,
@@ -436,70 +438,8 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Revenue Chart */}
-          <Card
-            className="mt-5 border-[rgba(0,0,0,0.08)] bg-white transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.02)]"
-            style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
-          >
-            <CardHeader className="p-6">
-              <CardTitle className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
-                Revenue Trend
-              </CardTitle>
-              <p className="text-[12px] tracking-[-0.32px] text-[#999999]">
-                Last 7 days
-              </p>
-            </CardHeader>
-            <CardContent className="px-6 pb-6">
-              <ChartContainer config={revenueChartConfig} className="aspect-auto h-[300px] w-full">
-                <AreaChart data={revenueData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#918DF6" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#918DF6" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" strokeDasharray="4 4" />
-                  <XAxis
-                    dataKey="day"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#999999" }}
-                    dy={8}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#999999" }}
-                    tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
-                    dx={-4}
-                  />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value) => (
-                          <span className="font-mono text-xs font-medium tabular-nums text-[#181925]">
-                            ${Number(value).toLocaleString()}
-                          </span>
-                        )}
-                      />
-                    }
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#918DF6"
-                    strokeWidth={2.5}
-                    fill="url(#revenueGradient)"
-                    dot={{ r: 3, fill: "#918DF6", stroke: "#fff", strokeWidth: 2 }}
-                    activeDot={{ r: 5, fill: "#918DF6", stroke: "#fff", strokeWidth: 2 }}
-                  />
-                </AreaChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          {/* Orders + Platform Split */}
-          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1fr_340px]">
+          {/* Orders (left) + Revenue Chart (right) */}
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1fr_480px]">
             {/* Recent Orders */}
             <Card
               className="border-[rgba(0,0,0,0.08)] bg-white transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.02)]"
@@ -559,27 +499,94 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Platform Breakdown */}
-            <Card className="border-[rgba(0,0,0,0.08)] bg-white" style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
-              <CardHeader>
-                <CardTitle className="text-[14px] font-medium tracking-[-0.32px] text-[#181925]">
+            {/* Revenue Chart */}
+            <Card
+              className="border-[rgba(0,0,0,0.08)] bg-white transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.02)]"
+              style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
+            >
+              <CardHeader className="p-6">
+                <CardTitle className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
+                  Revenue Trend
+                </CardTitle>
+                <p className="text-[12px] tracking-[-0.32px] text-[#999999]">
+                  Last 7 days
+                </p>
+              </CardHeader>
+              <CardContent className="px-6 pb-6">
+                <ChartContainer config={revenueChartConfig} className="aspect-auto h-[300px] w-full">
+                  <AreaChart data={revenueData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#918DF6" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#918DF6" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" strokeDasharray="4 4" />
+                    <XAxis
+                      dataKey="day"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: "#999999" }}
+                      dy={8}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: "#999999" }}
+                      tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+                      dx={-4}
+                    />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          formatter={(value) => (
+                            <span className="font-mono text-xs font-medium tabular-nums text-[#181925]">
+                              ${Number(value).toLocaleString()}
+                            </span>
+                          )}
+                        />
+                      }
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#918DF6"
+                      strokeWidth={2.5}
+                      fill="url(#revenueGradient)"
+                      dot={{ r: 3, fill: "#918DF6", stroke: "#fff", strokeWidth: 2 }}
+                      activeDot={{ r: 5, fill: "#918DF6", stroke: "#fff", strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Platform Split + Inventory */}
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <Card
+              className="border-[rgba(0,0,0,0.08)] bg-white transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.02)]"
+              style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
+            >
+              <CardHeader className="p-6">
+                <CardTitle className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
                   Platform Split
                 </CardTitle>
                 <p className="text-[12px] tracking-[-0.32px] text-[#999999]">
                   Order distribution
                 </p>
               </CardHeader>
-              <CardContent>
-                <ChartContainer config={platformChartConfig} className="aspect-auto h-[180px] w-full">
-                  <BarChart data={platformData} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
+              <CardContent className="px-6 pb-6">
+                <ChartContainer config={platformChartConfig} className="aspect-auto h-[200px] w-full">
+                  <BarChart data={platformData} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
                     <XAxis type="number" hide />
                     <YAxis
                       type="category"
                       dataKey="name"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: "#666666" }}
-                      width={90}
+                      tick={{ fontSize: 13, fill: "#666666" }}
+                      width={95}
                     />
                     <ChartTooltip
                       content={
@@ -592,7 +599,12 @@ export default function Dashboard() {
                         />
                       }
                     />
-                    <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
+                    <Bar
+                      dataKey="value"
+                      radius={[0, 6, 6, 0]}
+                      barSize={28}
+                      label={{ position: "right", fontSize: 12, fill: "#181925", fontWeight: 600, formatter: (v) => `${v}%` }}
+                    >
                       {platformData.map((entry, index) => (
                         <Cell key={index} fill={entry.color} />
                       ))}
@@ -600,15 +612,16 @@ export default function Dashboard() {
                   </BarChart>
                 </ChartContainer>
 
-                {/* Legend */}
-                <div className="mt-5 flex flex-col gap-3">
+                <div className="my-4 h-px bg-[rgba(0,0,0,0.08)]" />
+
+                <div className="flex flex-col gap-3.5">
                   {platformData.map((p) => (
                     <div key={p.name} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full" style={{ backgroundColor: p.color }} />
-                        <span className="text-[13px] tracking-[-0.32px] text-[#666666]">{p.name}</span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="size-2.5 rounded-full" style={{ backgroundColor: p.color }} />
+                        <span className="text-[14px] tracking-[-0.32px] text-[#666666]">{p.name}</span>
                       </div>
-                      <span className="text-[13px] font-medium tabular-nums tracking-[-0.32px] text-[#181925]">
+                      <span className="text-[14px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
                         {p.value}%
                       </span>
                     </div>
@@ -616,26 +629,28 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Inventory Status */}
-          <Card className="mt-8 border-[rgba(0,0,0,0.08)] bg-white" style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
-            <CardHeader>
-              <CardTitle className="text-[14px] font-medium tracking-[-0.32px] text-[#181925]">
-                Inventory Status
-              </CardTitle>
-              <p className="text-[12px] tracking-[-0.32px] text-[#999999]">
-                Keys remaining per product
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="divide-y divide-[rgba(0,0,0,0.08)]">
-                {inventory.map((item) => (
-                  <InventoryRow key={item.name} item={item} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            <Card
+              className="border-[rgba(0,0,0,0.08)] bg-white transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.02)]"
+              style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
+            >
+              <CardHeader className="p-6">
+                <CardTitle className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
+                  Inventory Status
+                </CardTitle>
+                <p className="text-[12px] tracking-[-0.32px] text-[#999999]">
+                  Keys remaining per product
+                </p>
+              </CardHeader>
+              <CardContent className="px-6 pb-6">
+                <div className="flex flex-col divide-y divide-[rgba(0,0,0,0.08)]">
+                  {inventory.map((item) => (
+                    <InventoryRow key={item.name} item={item} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>
