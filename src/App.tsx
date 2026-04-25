@@ -1171,9 +1171,7 @@ function App() {
         </div>
 
         <div className="mt-20 flex w-full justify-center pb-24">
-          <div className="origin-top scale-110">
-            <WorkflowVisualization />
-          </div>
+          <WorkflowVisualization />
         </div>
 
         <PainPointsSection />
