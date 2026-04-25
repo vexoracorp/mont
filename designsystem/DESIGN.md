@@ -61,7 +61,8 @@ Manages orders, inventory, and instant delivery across Naver Store, G2G, G2A, an
 | `--color-surface` | `#FFFFFF` | Page background, card backgrounds |
 | `--color-on-surface` | `#181925` | Primary text, headings |
 | `--color-muted` | `#666666` | Secondary text, inactive nav |
-| `--color-subtle` | `#999999` | Tertiary text, placeholders, logo cloud |
+| `--color-subtle` | `#767676` | Tertiary text, captions (WCAG AA minimum on white) |
+| `--color-placeholder` | `#999999` | Placeholders, decorative text only (not for info-carrying text) |
 | `--color-border` | `rgba(0,0,0,0.08)` | Card borders, dividers |
 | `--color-border-strong` | `#E6E6E8` | Active borders, tab underlines |
 
@@ -69,18 +70,27 @@ Manages orders, inventory, and instant delivery across Naver Store, G2G, G2A, an
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--color-success` | `#33C758` | Positive metrics, growth indicators |
-| `--color-danger` | `#FF2F00` | Negative metrics, decline indicators |
-| `--color-warning` | `#FFA600` | Warnings, amber alerts |
-| `--color-info` | `#2C78FC` | Links, informational elements |
+| `--color-success` | `#34A853` | Positive metrics, growth indicators — paired with ↑ icon or "+" prefix |
+| `--color-danger` | `#D93025` | Negative metrics, decline indicators — paired with ↓ icon or "−" prefix |
+| `--color-warning` | `#E37400` | Warnings, amber alerts — paired with ⚠ icon |
+| `--color-info` | `#1A73E8` | Links, informational elements |
+
+### Inclusive Color Rules (Apple HIG)
+
+- NEVER rely on color alone to convey meaning — always pair with icons, text labels, or shapes
+- Avoid red/green as the only differentiator — use ↑/↓ arrows, +/− prefixes alongside color
+- All text must meet WCAG AA contrast (4.5:1 on white): `#181925` (15.8:1 ✓), `#666666` (5.74:1 ✓), `#767676` (4.54:1 ✓ — minimum for subtle text)
+- `#999999` (2.85:1) is ONLY for decorative/non-essential text (placeholders, disabled states) — never for information-carrying text
+- Semantic colors are supplementary — the information must be understandable without them
+- Test designs with color blindness simulators (protanopia, deuteranopia, tritanopia)
 
 ### Indicator Dots (Metrics)
 
-| Metric | Color | Purpose |
-|--------|-------|---------|
-| Orders | `#2C78FC` (blue) | Order count indicator |
-| Revenue | `#33C758` (green) | Revenue indicator |
-| Delivered | `#33C758` (green) | Delivery success indicator |
+| Metric | Color | Shape | Purpose |
+|--------|-------|-------|---------|
+| Orders | `#1A73E8` (blue) | ● dot | Order count indicator |
+| Revenue | `#34A853` (green) | ▲ triangle or ↑ arrow | Revenue indicator |
+| Delivered | `#34A853` (green) | ✓ checkmark | Delivery success indicator |
 
 ### Color Rules
 
@@ -88,7 +98,8 @@ Manages orders, inventory, and instant delivery across Naver Store, G2G, G2A, an
 - Purple (`#918DF6`) is used ONLY for: primary CTA buttons, active tab indicators, and the logo mark.
 - Background gradients, if used, must be localized (inside a card/container), not page-wide washes.
 - Prefer `rgba(0,0,0,0.08)` borders over solid gray borders — they adapt to any background.
-- Text hierarchy: `#181925` → `#666666` → `#999999`. Never go lighter than `#999` for readable text.
+- Text hierarchy: `#181925` → `#666666` → `#767676`. Use `#999999` only for placeholders/decorative.
+- Never use color as the sole indicator of state — always pair with shape, icon, or text label.
 
 ---
 
