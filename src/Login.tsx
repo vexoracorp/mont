@@ -129,6 +129,10 @@ export default function Login() {
 
         <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 lg:px-16">
           <div className="w-full max-w-[420px]">
+            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center text-[13px] leading-relaxed text-amber-700">
+              Currently in test mode. No requests are sent to the server.
+            </div>
+
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

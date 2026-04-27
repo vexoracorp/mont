@@ -1,35 +1,29 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
 import {
-  LayoutDashboard,
-  ShoppingCart,
-  Package,
-  Database,
-  BarChart3,
-  Settings,
-  Menu,
   TrendingUp,
   TrendingDown,
-  AlertTriangle,
-  Calendar,
   ArrowRight,
+  Copy,
+  Check,
 } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer } from "recharts"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import DashboardLayout from "@/DashboardLayout"
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-} from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
+  type Order,
+  type Currency,
+  StatusBadge,
+  DeliveryChannel,
+  platformBadges,
+  formatUSD,
+  formatKRW,
+} from "@/shared"
 
 // ─── Mock Data ───────────────────────────────────────────────
 
@@ -41,122 +35,29 @@ const sparklineData = {
 }
 
 const platformData = [
-  { name: "Naver Store", value: 42, color: "#33C758" },
-  { name: "G2G", value: 35, color: "#2C78FC" },
-  { name: "G2A", value: 18, color: "#FFA600" },
+  { name: "Naver Store", value: 42, color: "#34A853" },
+  { name: "G2G", value: 35, color: "#1A73E8" },
+  { name: "G2A", value: 18, color: "#E37400" },
   { name: "Direct", value: 5, color: "#918DF6" },
 ]
 
-const orders = [
-  { id: "ORD-2847", platform: "Naver Store", amount: 29.99, status: "Delivered" as const, time: "2 min ago" },
-  { id: "ORD-2846", platform: "G2G", amount: 42.99, status: "Delivered" as const, time: "8 min ago" },
-  { id: "ORD-2845", platform: "G2A", amount: 12.99, status: "Processing" as const, time: "15 min ago" },
-  { id: "ORD-2844", platform: "Naver Store", amount: 24.99, status: "Delivered" as const, time: "23 min ago" },
-  { id: "ORD-2843", platform: "G2G", amount: 59.99, status: "Delivered" as const, time: "41 min ago" },
-  { id: "ORD-2842", platform: "G2A", amount: 49.99, status: "Failed" as const, time: "1 hour ago" },
+const orders: Order[] = [
+  { id: "4X7PA", platform: "Naver Store", amount: 29.99, status: "Delivered", time: "2분 전", product: "캔바 프로 Canva PRO 12개월", customer: "이정효", email: "leolee12@naver.com", delivery: "Telegram", keyCode: "XXXX-XXXX-7F3M" },
+  { id: "9K2BM", platform: "G2G", amount: 42.99, status: "Delivered", time: "8분 전", product: "Steam Wallet $50 Gift Card", customer: "Alex Turner", email: "g2g_buyer_8821", delivery: "Email", keyCode: "XXXX-XXXX-A2K9" },
+  { id: "3F8QN", platform: "G2A", amount: 12.99, status: "Processing", time: "15분 전", product: "Xbox Game Pass Ultimate 1개월", customer: "김수현", email: "g2a_user_3347", delivery: "SMS", keyCode: "XXXX-XXXX-9D1P" },
+  { id: "7W1DL", platform: "Naver Store", amount: 24.99, status: "Delivered", time: "23분 전", product: "Windows 11 Pro Key", customer: "박민지", email: "minji_park@naver.com", delivery: "Email", keyCode: "XXXX-XXXX-QW8E" },
+  { id: "6R5VC", platform: "G2G", amount: 59.99, status: "Delivered", time: "41분 전", product: "Elden Ring Shadow of the Erdtree DLC", customer: "James Kim", email: "g2g_buyer_1204", delivery: "Telegram", keyCode: "XXXX-XXXX-5TN2" },
+  { id: "2H9TE", platform: "G2A", amount: 49.99, status: "Failed", time: "1시간 전", product: "FIFA 25 Ultimate Edition", customer: "최영호", email: "g2a_user_7790", delivery: "WhatsApp", keyCode: "XXXX-XXXX-0000", errorStep: "Step 3 — Key Delivery", errorMessage: "WhatsApp API timeout: recipient unreachable after 3 retries. Key reserved but not delivered." },
 ]
 
 const inventory = [
+  { name: "GTA V Premium", remaining: 142, total: 200 },
+  { name: "Xbox Game Pass", remaining: 67, total: 150 },
+  { name: "PS Plus 12M", remaining: 34, total: 80 },
   { name: "Elden Ring", remaining: 8, total: 100 },
-  { name: "Windows 11 Pro Key", remaining: 3, total: 50 },
-  { name: "FIFA 25 Standard", remaining: 12, total: 60 },
+  { name: "Windows 11 Pro", remaining: 3, total: 50 },
+  { name: "FIFA 25", remaining: 12, total: 60 },
 ]
-
-const navItems = [
-  { label: "Overview", icon: LayoutDashboard, href: "/dashboard", active: true },
-  { label: "Orders", icon: ShoppingCart, href: "/dashboard/orders", active: false },
-  { label: "Products", icon: Package, href: "/dashboard/products", active: false },
-  { label: "Inventory", icon: Database, href: "/dashboard/inventory", active: false },
-  { label: "Analytics", icon: BarChart3, href: "/dashboard/analytics", active: false },
-  { label: "Settings", icon: Settings, href: "/dashboard/settings", active: false },
-]
-
-// ─── Sidebar ─────────────────────────────────────────────────
-
-function SidebarContent() {
-  const mainNav = navItems.slice(0, 4)
-  const secondaryNav = navItems.slice(4)
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2.5 border-b border-[rgba(0,0,0,0.08)] px-5 pt-6 pb-5">
-        <span className="relative flex size-7 items-center justify-center">
-          <span className="absolute inset-0 rounded-full bg-[#918DF6]" />
-          <span className="absolute top-0.5 right-0.5 size-3 rounded-full bg-[#F5F5F6]" />
-        </span>
-        <span className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
-          Mont
-        </span>
-      </div>
-
-      <nav className="flex flex-1 flex-col px-3 pt-4">
-        <div className="flex flex-col gap-0.5">
-          {mainNav.map((item) => {
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium tracking-[-0.32px] transition-colors ${
-                  item.active
-                    ? "bg-[#918DF6]/[0.12] text-[#918DF6]"
-                    : "text-[#666666] hover:bg-[rgba(0,0,0,0.04)] hover:text-[#181925]"
-                }`}
-              >
-                {item.active && (
-                  <span className="absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-r-full bg-[#918DF6]" />
-                )}
-                <Icon className="size-[18px]" strokeWidth={item.active ? 2.2 : 1.8} />
-                {item.label}
-              </Link>
-            )
-          })}
-        </div>
-
-        <div className="mx-3 my-3 h-px bg-[rgba(0,0,0,0.08)]" />
-
-        <div className="flex flex-col gap-0.5">
-          {secondaryNav.map((item) => {
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium tracking-[-0.32px] transition-colors ${
-                  item.active
-                    ? "bg-[#918DF6]/[0.12] text-[#918DF6]"
-                    : "text-[#666666] hover:bg-[rgba(0,0,0,0.04)] hover:text-[#181925]"
-                }`}
-              >
-                {item.active && (
-                  <span className="absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-r-full bg-[#918DF6]" />
-                )}
-                <Icon className="size-[18px]" strokeWidth={item.active ? 2.2 : 1.8} />
-                {item.label}
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
-
-      <div className="border-t border-[rgba(0,0,0,0.08)] px-4 py-4">
-        <div className="flex items-center gap-3">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#918DF6]/10 text-[11px] font-semibold text-[#918DF6]">
-            YC
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">
-              Yuchan
-            </p>
-            <p className="truncate text-[11px] tracking-[-0.32px] text-[#999999]">
-              yuchan@vexora.team
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ─── Sparkline ───────────────────────────────────────────────
 
@@ -193,6 +94,7 @@ function MetricCard({
   dotColor,
   positive,
   sparkData,
+  secondaryValue,
 }: {
   label: string
   value: string
@@ -200,6 +102,7 @@ function MetricCard({
   dotColor: string
   positive: boolean
   sparkData: { v: number; i: number }[]
+  secondaryValue?: string
 }) {
   return (
     <div
@@ -213,17 +116,17 @@ function MetricCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full" style={{ backgroundColor: dotColor }} />
-          <span className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">
+          <span className="text-[14px] font-medium tracking-[-0.32px] text-[#666666]">
             {label}
           </span>
         </div>
         <div className="flex items-center gap-1">
           {positive ? (
-            <TrendingUp className="size-3 text-[#33C758]" strokeWidth={2.5} />
+            <TrendingUp className="size-3.5 text-[#34A853]" strokeWidth={2.5} />
           ) : (
-            <TrendingDown className="size-3 text-[#33C758]" strokeWidth={2.5} />
+            <TrendingDown className="size-3.5 text-[#34A853]" strokeWidth={2.5} />
           )}
-          <span className="text-[12px] font-medium tracking-[-0.32px] text-[#33C758]">
+          <span className="text-[14px] font-semibold tracking-[-0.32px] text-[#34A853]">
             {change}
           </span>
         </div>
@@ -231,6 +134,11 @@ function MetricCard({
       <p className="mt-1 text-[24px] font-semibold leading-tight tracking-[-0.32px] tabular-nums text-[#181925]">
         {value}
       </p>
+      {secondaryValue && (
+        <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] tabular-nums text-[#999999]">
+          {secondaryValue}
+        </p>
+      )}
       <div className="mt-1">
         <Sparkline data={sparkData} color={dotColor} />
       </div>
@@ -238,80 +146,25 @@ function MetricCard({
   )
 }
 
-// ─── Status Badge ────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: "Delivered" | "Processing" | "Failed" }) {
-  const styles = {
-    Delivered: "bg-[#33C758]/10 text-[#33C758]",
-    Processing: "bg-[#FFA600]/10 text-[#FFA600]",
-    Failed: "bg-[#FF2F00]/10 text-[#FF2F00]",
-  }
-  return (
-    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium tracking-[-0.32px] ${styles[status]}`}>
-      {status}
-    </span>
-  )
-}
-
 // ─── Dashboard ───────────────────────────────────────────────
 
 export default function Dashboard() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [currency, setCurrency] = useState<Currency>("KRW")
+  const [copiedKey, setCopiedKey] = useState(false)
 
-  const lowStock = inventory.filter((item) => item.remaining < 20)
+  const handleCopyKey = (key: string) => {
+    void navigator.clipboard.writeText(key)
+    setCopiedKey(true)
+    setTimeout(() => setCopiedKey(false), 1500)
+  }
 
   return (
-    <div className="flex h-svh bg-[#F7F7F8]">
-      {/* Desktop Sidebar */}
-      <aside className="hidden w-[240px] shrink-0 border-r border-[rgba(0,0,0,0.08)] bg-[#F5F5F6] lg:block">
-        <SidebarContent />
-      </aside>
-
-      {/* Mobile Sidebar */}
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-[260px] bg-[#F5F5F6] p-0" showCloseButton={false}>
-          <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <SidebarContent />
-        </SheetContent>
-      </Sheet>
-
-      {/* Main Content — no scroll */}
-      <main className="flex flex-1 flex-col overflow-hidden">
-        {/* Header — compact */}
-        <header
-          className="flex shrink-0 items-center justify-between border-b border-[rgba(0,0,0,0.08)] bg-[#F7F7F8]/80 px-6 py-3 backdrop-blur-sm lg:px-8"
-          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-        >
-          <div className="flex items-center gap-3">
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="lg:hidden"
-                  />
-                }
-              >
-                <Menu className="size-5" />
-              </SheetTrigger>
-            </Sheet>
-            <h1 className="text-[20px] font-bold tracking-[-0.32px] text-[#181925]">
-              Overview
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="flex h-8 items-center gap-2 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-3.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]">
-              <Calendar className="size-3.5" strokeWidth={2} />
-              Apr 19 – Apr 25, 2026
-            </button>
-            <Button className="hidden h-8 rounded-full bg-[#918DF6] px-4 text-[13px] font-medium text-white hover:bg-[#9580FF] sm:flex">
-              Export
-            </Button>
-          </div>
-        </header>
-
-        {/* Dashboard body */}
+    <DashboardLayout
+      title="Overview"
+      currency={currency}
+      onCurrencyToggle={() => setCurrency(currency === "USD" ? "KRW" : "USD")}
+    >
         <div className="flex flex-1 flex-col gap-4 px-6 pt-4 pb-4 lg:px-8">
           {/* KPI Metrics — 4 cards */}
           <div className="grid shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -319,23 +172,24 @@ export default function Dashboard() {
               label="Total Orders"
               value="2,847"
               change="+12.5%"
-              dotColor="#2C78FC"
+              dotColor="#1A73E8"
               positive
               sparkData={sparklineData.orders}
             />
             <MetricCard
               label="Revenue"
-              value="$48,392"
+              value={currency === "KRW" ? "₩70,168,800" : "$48,392"}
               change="+8.2%"
-              dotColor="#33C758"
+              dotColor="#34A853"
               positive
               sparkData={sparklineData.revenue}
+              secondaryValue={currency === "KRW" ? "≈ $48,392" : "≈ ₩70,168,800"}
             />
             <MetricCard
               label="Delivery Success"
               value="99.7%"
               change="+0.3%"
-              dotColor="#33C758"
+              dotColor="#34A853"
               positive
               sparkData={sparklineData.success}
             />
@@ -349,92 +203,128 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Main content: Orders table (left) + Right panel */}
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-[1fr_280px]">
+          {/* Main content: Orders table + Platform Split side by side */}
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
             {/* Recent Orders */}
             <div
               className="flex flex-col overflow-hidden rounded-xl border border-[rgba(0,0,0,0.08)] bg-white"
               style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
             >
-              <div className="flex items-center justify-between px-5 pt-3.5 pb-2.5">
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
                 <div>
-                  <h2 className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">
+                  <h2 className="text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">
                     Recent Orders
                   </h2>
-                  <p className="text-[11px] tracking-[-0.32px] text-[#999999]">
+                  <p className="text-[13px] tracking-[-0.32px] text-[#999999]">
                     Last 6 transactions
                   </p>
                 </div>
-                <button className="flex items-center gap-1 text-[12px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:text-[#9580FF]">
+                <button className="flex items-center gap-1 text-[13px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:text-[#9580FF]">
                   View all
-                  <ArrowRight className="size-3" strokeWidth={2} />
+                  <ArrowRight className="size-3.5" strokeWidth={2} />
                 </button>
               </div>
-              <div className="flex-1 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[rgba(0,0,0,0.08)] bg-neutral-50/80 hover:bg-neutral-50/80">
-                      <TableHead className="h-8 pl-5 text-[11px] font-semibold tracking-[-0.32px] text-[#666666]">Order</TableHead>
-                      <TableHead className="h-8 text-[11px] font-semibold tracking-[-0.32px] text-[#666666]">Platform</TableHead>
-                      <TableHead className="h-8 text-right text-[11px] font-semibold tracking-[-0.32px] text-[#666666]">Amount</TableHead>
-                      <TableHead className="h-8 text-[11px] font-semibold tracking-[-0.32px] text-[#666666]">Status</TableHead>
-                      <TableHead className="h-8 pr-5 text-right text-[11px] font-semibold tracking-[-0.32px] text-[#666666]">Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id} className="border-[rgba(0,0,0,0.08)] transition-colors hover:bg-neutral-50/50">
-                        <TableCell className="h-10 pl-5 font-mono text-[13px] font-semibold tracking-[-0.32px] text-[#181925]">
-                          {order.id}
-                        </TableCell>
-                        <TableCell className="h-10 text-[13px] tracking-[-0.32px] text-[#666666]">
-                          {order.platform}
-                        </TableCell>
-                        <TableCell className="h-10 text-right font-mono text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
-                          ${order.amount.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="h-10">
-                          <StatusBadge status={order.status} />
-                        </TableCell>
-                        <TableCell className="h-10 pr-5 text-right text-[11px] tracking-[-0.32px] text-[#999999]">
-                          {order.time}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="flex items-center gap-3 px-5 pb-3">
+                <select className="h-9 w-24 shrink-0 appearance-none rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] font-medium tracking-[-0.32px] text-[#181925] outline-none">
+                  <option>All</option>
+                  <option>Naver Store</option>
+                  <option>G2G</option>
+                  <option>G2A</option>
+                </select>
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search orders..."
+                    className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white pl-3 pr-3 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
+                  />
+                </div>
+              </div>
+              <div className="overflow-y-auto">
+                <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
+                  {orders.map((order) => {
+                    const badge = platformBadges[order.platform]
+                    return (
+                      <button
+                        key={order.id}
+                        type="button"
+                        onClick={() => setSelectedOrder(order)}
+                        className={`flex w-full flex-col rounded-xl border border-[rgba(0,0,0,0.08)] p-4 text-left transition-colors hover:bg-neutral-50/60 ${
+                          order.status === "Failed" ? "bg-[#D93025]/[0.03]" : "bg-white"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="min-w-0 truncate text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
+                            {order.product}
+                          </p>
+                          <div className="flex shrink-0 flex-col items-end gap-1">
+                            <StatusBadge status={order.status} />
+                            <DeliveryChannel channel={order.delivery} />
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</span>
+                          <span className="text-[#999999]">·</span>
+                          {badge && (
+                            <span className={`${badge.bg} inline-flex size-4 shrink-0 items-center justify-center rounded font-bold text-white ${badge.textSize}`}>
+                              {badge.label}
+                            </span>
+                          )}
+                          <span className="text-[13px] tracking-[-0.32px] text-[#666666]">{order.platform}</span>
+                          <span className="text-[#999999]">·</span>
+                          <span className="text-[12px] tracking-[-0.32px] text-[#999999]">{order.time}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-[15px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
+                              {formatUSD(order.amount)}
+                            </span>
+                            {currency === "KRW" && (
+                              <span className="text-[12px] font-medium tabular-nums tracking-[-0.32px] text-[#999999]">
+                                {formatKRW(order.amount)}
+                              </span>
+                            )}
+                          </div>
+                          {order.status === "Failed" && order.errorMessage && (
+                            <span className="inline-flex items-center truncate rounded-lg bg-[#D93025]/8 px-3 py-1 text-[13px] font-semibold tracking-[-0.2px] text-[#D93025]">
+                              {order.errorStep}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Right panel: Platform Split + Low Stock Alerts */}
-            <div className="flex flex-col gap-4">
-              {/* Platform Split */}
+            {/* Right panel */}
+            <div className="flex flex-col gap-4 overflow-y-auto">
               <div
-                className="rounded-xl border border-[rgba(0,0,0,0.08)] bg-white px-4 pt-3.5 pb-4"
+                className="rounded-xl border border-[rgba(0,0,0,0.08)] bg-white px-5 pt-4 pb-5"
                 style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
               >
-                <h2 className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">
+                <h2 className="text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">
                   Platform Split
                 </h2>
-                <p className="text-[11px] tracking-[-0.32px] text-[#999999]">
+                <p className="text-[13px] tracking-[-0.32px] text-[#999999]">
                   Order distribution
                 </p>
-                <div className="mt-3 flex flex-col gap-2.5">
+                <div className="mt-4 flex flex-col gap-3">
                   {platformData.map((p) => (
-                    <div key={p.name} className="flex items-center gap-2.5">
-                      <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
-                      <span className="w-[72px] shrink-0 text-[13px] tracking-[-0.32px] text-[#666666]">
+                    <div key={p.name} className="flex items-center gap-3">
+                      <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
+                      <span className="w-[80px] shrink-0 text-[14px] tracking-[-0.32px] text-[#666666]">
                         {p.name}
                       </span>
                       <div className="flex-1">
-                        <div className="h-[6px] w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.06)]">
+                        <div className="h-[7px] w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.06)]">
                           <div
                             className="h-full rounded-full"
                             style={{ width: `${p.value}%`, backgroundColor: p.color }}
                           />
                         </div>
                       </div>
-                      <span className="w-8 shrink-0 text-right text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
+                      <span className="w-10 shrink-0 text-right text-[14px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
                         {p.value}%
                       </span>
                     </div>
@@ -442,56 +332,176 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Low Stock Alerts */}
               <div
-                className="flex-1 rounded-xl border border-[rgba(0,0,0,0.08)] bg-white px-4 pt-3.5 pb-4"
+                className="rounded-xl border border-[rgba(0,0,0,0.08)] bg-white px-5 pt-4 pb-5"
                 style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
               >
-                <div className="flex items-center gap-1.5">
-                  <AlertTriangle className="size-3.5 text-[#FFA600]" strokeWidth={2.2} />
-                  <h2 className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">
-                    Low Stock Alerts
-                  </h2>
-                </div>
-                <p className="text-[11px] tracking-[-0.32px] text-[#999999]">
-                  Products below 20 keys
+                <h2 className="text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">
+                  All Inventory
+                </h2>
+                <p className="text-[13px] tracking-[-0.32px] text-[#999999]">
+                  Keys remaining
                 </p>
-                {lowStock.length === 0 ? (
-                  <p className="mt-3 text-[13px] tracking-[-0.32px] text-[#33C758]">
-                    All products stocked ✓
-                  </p>
-                ) : (
-                  <div className="mt-3 flex flex-col gap-3">
-                    {lowStock.map((item) => {
-                      const pct = (item.remaining / item.total) * 100
-                      const barColor = pct > 15 ? "#FFA600" : "#FF2F00"
-                      return (
-                        <div key={item.name}>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[13px] tracking-[-0.32px] text-[#181925]">
-                              {item.name}
-                            </span>
-                            <span className="text-[13px] font-semibold tabular-nums tracking-[-0.32px]" style={{ color: barColor }}>
-                              {item.remaining}
-                              <span className="font-normal text-[#999999]">/{item.total}</span>
-                            </span>
-                          </div>
-                          <div className="mt-1 h-[5px] w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.06)]">
-                            <div
-                              className="h-full rounded-full"
-                              style={{ width: `${pct}%`, backgroundColor: barColor }}
-                            />
-                          </div>
+                <div className="mt-3 flex flex-col gap-3">
+                  {inventory.map((item) => {
+                    const pct = (item.remaining / item.total) * 100
+                    const barColor = pct > 30 ? "#33C758" : pct > 15 ? "#E37400" : "#D93025"
+                    return (
+                      <div key={item.name}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] tracking-[-0.32px] text-[#181925]">
+                            {item.name}
+                          </span>
+                          <span className="text-[14px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
+                            {item.remaining}
+                            <span className="font-normal text-[#999999]">/{item.total}</span>
+                          </span>
                         </div>
-                      )
-                    })}
-                  </div>
-                )}
+                        <div className="mt-1.5 h-[6px] w-full overflow-hidden rounded-full bg-[rgba(0,0,0,0.06)]">
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${pct}%`, backgroundColor: barColor }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Order Detail Modal */}
+        <Dialog open={selectedOrder !== null} onOpenChange={(open) => { if (!open) { setSelectedOrder(null); setCopiedKey(false) } }}>
+          {selectedOrder && (
+            <DialogContent className="sm:max-w-md" showCloseButton>
+              <DialogHeader>
+                <DialogTitle className="text-[18px] font-bold tracking-[-0.32px] text-[#181925]">
+                  Order #{selectedOrder.id}
+                </DialogTitle>
+                <DialogDescription className="text-[14px] tracking-[-0.32px] text-[#666666]">
+                  {selectedOrder.product}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="flex flex-col gap-4">
+                {/* Status & Amount */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Status</p>
+                    <div className="mt-1">
+                      <StatusBadge status={selectedOrder.status} />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Amount</p>
+                    <p className="mt-1 text-[16px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
+                      {formatUSD(selectedOrder.amount)}
+                      <span className="ml-1.5 text-[12px] font-medium text-[#999999]">
+                        (≈ {formatKRW(selectedOrder.amount)})
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
+
+                {/* Error Details (Failed orders only) */}
+                {selectedOrder.status === "Failed" && selectedOrder.errorMessage && (
+                  <>
+                    <div className="rounded-lg border border-[#D93025]/15 bg-[#D93025]/[0.04] px-4 py-3">
+                      <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#D93025]">
+                        {selectedOrder.errorStep}
+                      </p>
+                      <p className="mt-1.5 text-[12px] leading-relaxed tracking-[-0.32px] text-[#666666]">
+                        {selectedOrder.errorMessage}
+                      </p>
+                    </div>
+                    <div className="h-px bg-[rgba(0,0,0,0.08)]" />
+                  </>
+                )}
+
+                {/* Customer */}
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Customer</p>
+                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Name</p>
+                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.customer}</p>
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Email</p>
+                      <p className="mt-0.5 truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.email}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Platform</p>
+                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.platform}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
+
+                {/* Delivery */}
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Delivery</p>
+                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Method</p>
+                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.delivery}</p>
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Delivered at</p>
+                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">Apr 25, 2026 · {selectedOrder.time}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Key Code</p>
+                      <div className="mt-0.5 flex items-center gap-2">
+                        <p className="text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{selectedOrder.keyCode}</p>
+                        <button
+                          onClick={() => handleCopyKey(selectedOrder.keyCode)}
+                          className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-[rgba(0,0,0,0.06)]"
+                        >
+                          {copiedKey ? (
+                            <Check className="size-3.5 text-[#34A853]" strokeWidth={2.5} />
+                          ) : (
+                            <Copy className="size-3.5 text-[#999999]" strokeWidth={2} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
+
+                {/* Transaction */}
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Transaction</p>
+                  <div className="mt-2 grid grid-cols-3 gap-x-4 gap-y-2.5">
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Order ID</p>
+                      <p className="mt-0.5 text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{selectedOrder.id}</p>
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Platform Fee</p>
+                      <p className="mt-0.5 text-[13px] font-medium tabular-nums tracking-[-0.32px] text-[#181925]">
+                        {formatUSD(selectedOrder.amount * 0.05)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Net Revenue</p>
+                      <p className="mt-0.5 text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#34A853]">
+                        {formatUSD(selectedOrder.amount * 0.95)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          )}
+        </Dialog>
+    </DashboardLayout>
   )
 }

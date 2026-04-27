@@ -154,7 +154,7 @@ function ChatFloodVisual({ animate }: { animate: boolean }) {
     "Nvm, buying elsewhere",
   ]
 
-  const [visibleMessages, setVisibleMessages] = useState<{ text: string; id: number }[]>([])
+  const [visibleMessages, setVisibleMessages] = useState<{ text: string; id: number; time: string }[]>([])
   const [badge, setBadge] = useState(0)
   const [leftChat, setLeftChat] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -184,7 +184,10 @@ function ChatFloodVisual({ animate }: { animate: boolean }) {
 
       const text = allMessages[msgIndex]
       const id = idCounter.current++
-      setVisibleMessages(prev => [...prev.slice(-8), { text, id }])
+      const mins = 14 + Math.floor(msgIndex / 3)
+      const secs = (msgIndex * 7) % 60
+      const time = `2:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0").slice(0, 2)}`
+      setVisibleMessages(prev => [...prev.slice(-6), { text, id, time: time.slice(0, 4) + " PM" }])
       setBadge(prev => Math.min(prev + Math.floor(Math.random() * 3) + 1, 99))
       msgIndex++
 
@@ -203,53 +206,88 @@ function ChatFloodVisual({ animate }: { animate: boolean }) {
   }, [animate])
 
   return (
-    <div className="relative mt-4 h-[240px] w-full max-w-[400px] overflow-hidden rounded-2xl bg-[#0B141A]">
-      <div className="flex items-center gap-2 border-b border-white/10 bg-[#1F2C34] px-3 py-2">
-        <span className="size-5 rounded-full bg-[#25D366]/30" />
-        <span className="text-xs font-medium text-[#E9EDEF]">Customers</span>
-        <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-[#FF2F00] text-[9px] font-bold text-white">
-          {badge > 99 ? "99+" : badge || "0"}
+    <div className="relative mt-4 h-[260px] w-full max-w-[400px] overflow-hidden rounded-xl" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)" }}>
+      <div className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: "#008069" }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white/60"><path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <span className="flex size-8 items-center justify-center rounded-full bg-[#DFE5E7]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8696A0"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-medium text-white">Customers</p>
+          <p className="text-[11px] text-white/70">online</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z" fill="white" fillOpacity="0.7"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="white" fillOpacity="0.7"/><circle cx="12" cy="12" r="1.5" fill="white" fillOpacity="0.7"/><circle cx="12" cy="19" r="1.5" fill="white" fillOpacity="0.7"/></svg>
+        </div>
       </div>
+
       <div
         ref={scrollRef}
-        className="flex flex-col gap-1 overflow-hidden p-2.5"
-        style={{ height: "calc(100% - 36px)" }}
+        className="flex flex-col gap-[3px] overflow-hidden px-3 py-2"
+        style={{
+          height: "calc(100% - 52px)",
+          backgroundColor: "#EFEAE2",
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000' fill-opacity='0.03'%3E%3Ccircle cx='10' cy='10' r='1'/%3E%3Ccircle cx='30' cy='25' r='0.8'/%3E%3Ccircle cx='50' cy='8' r='0.6'/%3E%3Ccircle cx='20' cy='45' r='0.7'/%3E%3Ccircle cx='45' cy='50' r='0.9'/%3E%3C/g%3E%3C/svg%3E\")",
+        }}
       >
         <AnimatePresence initial={false}>
           {visibleMessages.map((msg) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, x: -16, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
+              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="self-start"
             >
               <div
-                className="px-2.5 py-1"
+                className="relative px-2 py-1"
                 style={{
-                  backgroundColor: "#202C33",
-                  borderRadius: "2px 10px 10px 10px",
-                  maxWidth: 220,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "0 8px 8px 8px",
+                  boxShadow: "0 1px 0.5px rgba(11,20,26,0.13)",
+                  maxWidth: 280,
                 }}
               >
-                <span className="text-[11px] leading-snug text-[#E9EDEF]">{msg.text}</span>
+                <span className="text-[12.5px] leading-[1.35] text-[#111B21]">{msg.text}</span>
+                <span className="ml-2 inline-block translate-y-[2px] text-[10px] text-[#667781]">{msg.time}</span>
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
         {leftChat && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             className="self-center py-1"
           >
-            <span className="rounded-full bg-[#FF2F00]/20 px-2.5 py-0.5 text-[10px] font-medium text-[#FF2F00]">Customer left the chat</span>
+            <span
+              className="rounded-[7px] px-3 py-1 text-[11px] text-[#111B21]"
+              style={{ backgroundColor: "#FFEECC", boxShadow: "0 1px 0.5px rgba(11,20,26,0.08)" }}
+            >
+              Customer left the chat
+            </span>
           </motion.div>
         )}
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#0B141A] to-transparent" />
+
+      <div className="pointer-events-none absolute right-3 top-[52px] z-10">
+        <AnimatePresence>
+          {badge > 0 && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold text-white"
+              style={{ backgroundColor: "#25D366" }}
+            >
+              {badge > 99 ? "99+" : badge}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6" style={{ background: "linear-gradient(to top, #EFEAE2, transparent)" }} />
     </div>
   )
 }
@@ -1180,6 +1218,28 @@ function App() {
         <IntegrationSection />
 
         <ComparisonSection />
+
+        {/* Footer */}
+        <footer className="mt-32 w-full border-t border-[#E5E5E5] py-10">
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center text-xs leading-relaxed text-[#999999]">
+            <div className="flex items-center gap-2">
+              <span className="relative flex size-5 items-center justify-center">
+                <span className="absolute inset-0 rounded-full bg-[#918DF6]" />
+                <span className="absolute top-0.5 right-0.5 size-2.5 rounded-full bg-white" />
+              </span>
+              <span className="text-sm font-semibold text-[#181925]">Mont</span>
+            </div>
+            <p className="text-[#666666]">
+              OneH International &middot; Representative YUCHAN HAN
+            </p>
+            <p>
+              Business Registration No. 812-33-01680 &middot; 1914-S1, 11, Mirae-ro, Seo-gu, Incheon, Republic of Korea
+            </p>
+            <p className="mt-2 text-[#BBBBBB]">
+              &copy; {new Date().getFullYear()} OneH International. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </main>
     </div>
   )
