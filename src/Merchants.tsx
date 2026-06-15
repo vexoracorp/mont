@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Settings, Unplug, Globe, Download, Check, Package, Truck, Store } from "lucide-react"
+import { Settings, Unplug, Globe, Download, Check, Package, Truck, Store, Eye, EyeOff } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -40,7 +40,113 @@ type Plugin = {
   configSnippet: string
 }
 
-const merchants: Merchant[] = [
+type SettingsFieldBase = {
+  key: string
+  label: string
+  helperText?: string
+  section?: string
+  halfWidth?: boolean
+}
+
+type SettingsFieldText = SettingsFieldBase & {
+  type: "text"
+  placeholder?: string
+  defaultValue?: string
+}
+
+type SettingsFieldPassword = SettingsFieldBase & {
+  type: "password"
+  placeholder?: string
+  defaultValue?: string
+}
+
+type SettingsFieldCheckbox = SettingsFieldBase & {
+  type: "checkbox"
+  defaultValue?: boolean
+}
+
+type SettingsFieldSelect = SettingsFieldBase & {
+  type: "select"
+  options: string[]
+  defaultValue?: string
+}
+
+type SettingsFieldNumber = SettingsFieldBase & {
+  type: "number"
+  placeholder?: string
+  defaultValue?: number
+}
+
+type SettingsField =
+  | SettingsFieldText
+  | SettingsFieldPassword
+  | SettingsFieldCheckbox
+  | SettingsFieldSelect
+  | SettingsFieldNumber
+
+type PlatformSettingsConfig = {
+  description: string
+  fields: SettingsField[]
+  storeNameKey: string
+  apiKeyKey: string
+}
+
+const platformSettingsConfigs: Record<string, PlatformSettingsConfig> = {
+  naver: {
+    description: "Configure your Naver Commerce API connection.",
+    storeNameKey: "storeName",
+    apiKeyKey: "apiKey",
+    fields: [
+      { key: "storeName", label: "Store Name", type: "text", placeholder: "Your Naver store name", section: "Connection", halfWidth: true },
+      { key: "apiKey", label: "API Key", type: "password", placeholder: "Naver Commerce API key", section: "Connection" },
+      { key: "secretKey", label: "Secret Key", type: "password", placeholder: "Naver Commerce secret key", section: "Connection" },
+      { key: "autoDelivery", label: "Auto-delivery", type: "checkbox", defaultValue: true, section: "Delivery", halfWidth: true },
+      { key: "orderSyncInterval", label: "Order sync interval", type: "select", options: ["Real-time", "Every 5 min", "Every 15 min", "Every 30 min"], defaultValue: "Real-time", section: "Delivery", halfWidth: true },
+      { key: "webhookUrl", label: "Webhook URL", type: "text", placeholder: "https://your-domain.com/naver/webhook", section: "Integration" },
+    ],
+  },
+  g2g: {
+    description: "Configure your G2G Marketplace API connection.",
+    storeNameKey: "sellerName",
+    apiKeyKey: "apiKey",
+    fields: [
+      { key: "sellerName", label: "Seller Name", type: "text", placeholder: "Your G2G seller name", section: "Connection", halfWidth: true },
+      { key: "apiKey", label: "API Key", type: "password", placeholder: "G2G API key", section: "Connection" },
+      { key: "priceMarkup", label: "Price markup %", type: "number", placeholder: "e.g. 5", defaultValue: 5, section: "Pricing", halfWidth: true },
+      { key: "defaultCurrency", label: "Default currency", type: "select", options: ["USD", "EUR", "KRW"], defaultValue: "USD", section: "Pricing", halfWidth: true },
+      { key: "autoDelivery", label: "Auto-delivery", type: "checkbox", defaultValue: true, section: "Delivery", halfWidth: true },
+      { key: "inventorySync", label: "Inventory sync", type: "checkbox", defaultValue: true, section: "Delivery", halfWidth: true },
+    ],
+  },
+  g2a: {
+    description: "Configure your G2A Marketplace API connection.",
+    storeNameKey: "sellerId",
+    apiKeyKey: "apiKey",
+    fields: [
+      { key: "sellerId", label: "Seller ID", type: "text", placeholder: "Your G2A seller ID", section: "Connection", halfWidth: true },
+      { key: "apiKey", label: "API Key", type: "password", placeholder: "G2A API key", section: "Connection" },
+      { key: "apiSecret", label: "API Secret", type: "password", placeholder: "G2A API secret", section: "Connection" },
+      { key: "autoDelivery", label: "Auto-delivery", type: "checkbox", defaultValue: true, section: "Delivery", halfWidth: true },
+      { key: "returnPolicy", label: "Return policy", type: "select", options: ["Standard 14-day", "Extended 30-day", "No returns"], defaultValue: "Standard 14-day", section: "Delivery", halfWidth: true },
+      { key: "sandboxMode", label: "Sandbox mode", type: "checkbox", defaultValue: false, helperText: "Enable for testing only", section: "Advanced", halfWidth: true },
+    ],
+  },
+  direct: {
+    description: "Configure your custom webhook delivery endpoint.",
+    storeNameKey: "siteUrl",
+    apiKeyKey: "webhookSecret",
+    fields: [
+      { key: "siteUrl", label: "Site URL", type: "text", placeholder: "https://your-site.com", section: "Endpoints" },
+      { key: "webhookUrl", label: "Webhook URL", type: "text", placeholder: "https://your-site.com/api/webhook", section: "Endpoints" },
+      { key: "deliveryCallbackUrl", label: "Delivery callback URL", type: "text", placeholder: "https://your-site.com/api/callback", section: "Endpoints" },
+      { key: "webhookSecret", label: "Webhook Secret", type: "password", placeholder: "Your webhook signing secret", section: "Security" },
+      { key: "autoDelivery", label: "Auto-delivery", type: "checkbox", defaultValue: true, section: "Delivery", halfWidth: true },
+      { key: "rateLimit", label: "Rate limit", type: "number", placeholder: "requests/min", defaultValue: 60, section: "Delivery", halfWidth: true },
+    ],
+  },
+}
+
+const initialMerchants: Merchant[] = [
   {
     id: "naver",
     name: "Naver Store",
@@ -81,10 +187,7 @@ const merchants: Merchant[] = [
   },
 ]
 
-const connectedCount = merchants.filter((m) => m.connected).length
-const totalOrders = merchants.reduce((sum, m) => sum + (m.orderCount ?? 0), 0)
-
-const plugins: Plugin[] = [
+const initialPlugins: Plugin[] = [
   {
     id: "coupang",
     name: "Coupang Connector",
@@ -243,17 +346,127 @@ type PluginFilter = (typeof pluginFilters)[number]
 
 export default function Merchants() {
   const [currency, setCurrency] = useState<Currency>("KRW")
+  const [merchants, setMerchants] = useState<Merchant[]>(initialMerchants)
+  const [plugins, setPlugins] = useState<Plugin[]>(initialPlugins)
   const [connectTarget, setConnectTarget] = useState<Merchant | null>(null)
+  const [connectApiKey, setConnectApiKey] = useState("")
+  const [connectStoreId, setConnectStoreId] = useState("")
   const [pluginFilter, setPluginFilter] = useState<PluginFilter>("All")
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null)
   const [activeTab, setActiveTab] = useState<"platforms" | "plugins">("platforms")
+  const [settingsTarget, setSettingsTarget] = useState<Merchant | null>(null)
+  const [settingsValues, setSettingsValues] = useState<Record<string, string | boolean | number>>({})
+  const [settingsPasswordVisible, setSettingsPasswordVisible] = useState<Record<string, boolean>>({})
 
+  const connectedCount = merchants.filter((m) => m.connected).length
+  const totalOrders = merchants.reduce((sum, m) => sum + (m.orderCount ?? 0), 0)
   const connectedMerchants = merchants.filter((m) => m.connected)
   const availableMerchants = merchants.filter((m) => !m.connected)
   const filteredPlugins =
     pluginFilter === "All"
       ? plugins
       : plugins.filter((p) => p.category === pluginFilter)
+
+  function handleConnect() {
+    if (!connectTarget) return
+    const maskedKey = connectApiKey.length > 4
+      ? connectApiKey.slice(0, 4) + "-••••••••" + connectApiKey.slice(-4)
+      : connectApiKey
+    setMerchants((prev) =>
+      prev.map((m) =>
+        m.id === connectTarget.id
+          ? {
+              ...m,
+              connected: true,
+              storeName: connectStoreId || m.name,
+              connectedSince: new Date().toISOString().split("T")[0],
+              orderCount: 0,
+              apiKey: maskedKey,
+            }
+          : m
+      )
+    )
+    setConnectTarget(null)
+    setConnectApiKey("")
+    setConnectStoreId("")
+  }
+
+  function handleDisconnect(id: string) {
+    setMerchants((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? {
+              ...m,
+              connected: false,
+              storeName: undefined,
+              connectedSince: undefined,
+              orderCount: undefined,
+              apiKey: undefined,
+            }
+          : m
+      )
+    )
+  }
+
+  function openSettings(m: Merchant) {
+    const config = platformSettingsConfigs[m.id]
+    if (!config) return
+    const initial: Record<string, string | boolean | number> = {}
+    for (const field of config.fields) {
+      if (field.key === config.storeNameKey && m.storeName) {
+        initial[field.key] = m.storeName
+      } else if (field.key === config.apiKeyKey && m.apiKey) {
+        initial[field.key] = m.apiKey
+      } else if (field.type === "checkbox") {
+        initial[field.key] = field.defaultValue ?? false
+      } else if (field.type === "number") {
+        initial[field.key] = field.defaultValue ?? 0
+      } else if (field.type === "select") {
+        initial[field.key] = field.defaultValue ?? field.options[0]
+      } else {
+        initial[field.key] = (field as SettingsFieldText | SettingsFieldPassword).defaultValue ?? ""
+      }
+    }
+    setSettingsTarget(m)
+    setSettingsValues(initial)
+    setSettingsPasswordVisible({})
+  }
+
+  function handleSaveSettings() {
+    if (!settingsTarget) return
+    const config = platformSettingsConfigs[settingsTarget.id]
+    if (!config) return
+    const rawStoreName = String(settingsValues[config.storeNameKey] ?? "")
+    const rawApiKey = String(settingsValues[config.apiKeyKey] ?? "")
+    const maskedKey = rawApiKey.includes("••••")
+      ? rawApiKey
+      : rawApiKey.length > 4
+        ? rawApiKey.slice(0, 4) + "-••••••••" + rawApiKey.slice(-4)
+        : rawApiKey
+    setMerchants((prev) =>
+      prev.map((m) =>
+        m.id === settingsTarget.id
+          ? { ...m, storeName: rawStoreName, apiKey: maskedKey }
+          : m
+      )
+    )
+    setSettingsTarget(null)
+  }
+
+  function handleToggleInstall(pluginId: string) {
+    setPlugins((prev) =>
+      prev.map((p) =>
+        p.id === pluginId
+          ? { ...p, installed: !p.installed, installs: p.installed ? p.installs - 1 : p.installs + 1 }
+          : p
+      )
+    )
+    if (selectedPlugin && selectedPlugin.id === pluginId) {
+      setSelectedPlugin((prev) =>
+        prev ? { ...prev, installed: !prev.installed, installs: prev.installed ? prev.installs - 1 : prev.installs + 1 } : null
+      )
+    }
+  }
 
   return (
     <DashboardLayout
@@ -337,11 +550,17 @@ export default function Merchants() {
                 <span className="tabular-nums text-[#999999]">{m.apiKey}</span>
               </div>
               <div className="mt-2.5 flex items-center gap-1.5">
-                <button className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]">
+                <button
+                  onClick={() => handleDisconnect(m.id)}
+                  className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]"
+                >
                   <Unplug className="size-3" strokeWidth={2} />
                   Disconnect
                 </button>
-                <button className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]">
+                <button
+                  onClick={() => openSettings(m)}
+                  className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]"
+                >
                   <Settings className="size-3" strokeWidth={2} />
                   Settings
                 </button>
@@ -448,7 +667,11 @@ export default function Merchants() {
                       Installed
                     </span>
                   ) : (
-                    <span className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                    <span
+                      role="button"
+                      onClick={(e) => { e.stopPropagation(); handleToggleInstall(p.id) }}
+                      className="flex h-7 items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] hover:bg-[rgba(0,0,0,0.02)]"
+                    >
                       <Download className="size-3" strokeWidth={2} />
                       Install
                     </span>
@@ -466,7 +689,11 @@ export default function Merchants() {
       <Dialog
         open={connectTarget !== null}
         onOpenChange={(open) => {
-          if (!open) setConnectTarget(null)
+          if (!open) {
+            setConnectTarget(null)
+            setConnectApiKey("")
+            setConnectStoreId("")
+          }
         }}
       >
         {connectTarget && (
@@ -487,6 +714,8 @@ export default function Merchants() {
                 </label>
                 <input
                   type="text"
+                  value={connectApiKey}
+                  onChange={(e) => setConnectApiKey(e.target.value)}
                   placeholder="Enter your API key"
                   className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
                 />
@@ -497,6 +726,8 @@ export default function Merchants() {
                 </label>
                 <input
                   type="text"
+                  value={connectStoreId}
+                  onChange={(e) => setConnectStoreId(e.target.value)}
                   placeholder="Enter your store ID"
                   className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
                 />
@@ -514,12 +745,15 @@ export default function Merchants() {
 
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
-                  onClick={() => setConnectTarget(null)}
+                  onClick={() => { setConnectTarget(null); setConnectApiKey(""); setConnectStoreId("") }}
                   className="flex h-8 items-center rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-4 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]"
                 >
                   Cancel
                 </button>
-                <button className="flex h-8 items-center rounded-full bg-[#918DF6] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#9580FF]">
+                <button
+                  onClick={handleConnect}
+                  className="flex h-8 items-center rounded-full bg-[#918DF6] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#9580FF]"
+                >
                   Connect
                 </button>
               </div>
@@ -572,11 +806,17 @@ export default function Merchants() {
 
               <div className="flex items-center justify-end">
                 {selectedPlugin.installed ? (
-                  <button className="flex h-8 items-center gap-1.5 rounded-full border border-[#D93025]/20 bg-[#D93025]/[0.06] px-4 text-[13px] font-medium tracking-[-0.32px] text-[#D93025] transition-colors hover:bg-[#D93025]/10">
+                  <button
+                    onClick={() => handleToggleInstall(selectedPlugin.id)}
+                    className="flex h-8 items-center gap-1.5 rounded-full border border-[#D93025]/20 bg-[#D93025]/[0.06] px-4 text-[13px] font-medium tracking-[-0.32px] text-[#D93025] transition-colors hover:bg-[#D93025]/10"
+                  >
                     Uninstall
                   </button>
                 ) : (
-                  <button className="flex h-8 items-center gap-1.5 rounded-full bg-[#918DF6] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#9580FF]">
+                  <button
+                    onClick={() => handleToggleInstall(selectedPlugin.id)}
+                    className="flex h-8 items-center gap-1.5 rounded-full bg-[#918DF6] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#9580FF]"
+                  >
                     <Download className="size-3.5" strokeWidth={2} />
                     Install
                   </button>
@@ -585,6 +825,190 @@ export default function Merchants() {
             </div>
           </DialogContent>
         )}
+      </Dialog>
+
+      {/* Settings Modal */}
+      <Dialog
+        open={settingsTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setSettingsTarget(null)
+        }}
+      >
+        {settingsTarget && (() => {
+          const config = platformSettingsConfigs[settingsTarget.id]
+          if (!config) return null
+
+          const sections: { name: string; fields: SettingsField[] }[] = []
+          for (const field of config.fields) {
+            const sectionName = field.section ?? ""
+            const last = sections[sections.length - 1]
+            if (last && last.name === sectionName) {
+              last.fields.push(field)
+            } else {
+              sections.push({ name: sectionName, fields: [field] })
+            }
+          }
+
+          const renderField = (field: SettingsField) => {
+            if (field.type === "checkbox") {
+              return (
+                <label key={field.key} className={`flex flex-col gap-1${field.halfWidth ? "" : " col-span-2"}`}>
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(settingsValues[field.key])}
+                      onChange={(e) => setSettingsValues((prev) => ({ ...prev, [field.key]: e.target.checked }))}
+                      className="size-4 rounded border-[rgba(0,0,0,0.12)] accent-[#918DF6]"
+                    />
+                    <span className="text-[13px] tracking-[-0.32px] text-[#181925]">
+                      {field.label}
+                    </span>
+                  </div>
+                  {field.helperText && (
+                    <span className="ml-[26px] text-[11px] tracking-[-0.32px] text-[#E8A838]">{field.helperText}</span>
+                  )}
+                </label>
+              )
+            }
+
+            if (field.type === "select") {
+              return (
+                <div key={field.key} className={field.halfWidth ? "" : "col-span-2"}>
+                  <label className="mb-1.5 block text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                    {field.label}
+                  </label>
+                  <select
+                    value={String(settingsValues[field.key] ?? "")}
+                    onChange={(e) => setSettingsValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] tracking-[-0.32px] text-[#181925] outline-none"
+                  >
+                    {field.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                  {field.helperText && (
+                    <span className="mt-1 block text-[11px] tracking-[-0.32px] text-[#999999]">{field.helperText}</span>
+                  )}
+                </div>
+              )
+            }
+
+            if (field.type === "number") {
+              return (
+                <div key={field.key} className={field.halfWidth ? "" : "col-span-2"}>
+                  <label className="mb-1.5 block text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                    {field.label}
+                  </label>
+                  <input
+                    type="number"
+                    value={settingsValues[field.key] as number ?? 0}
+                    onChange={(e) => setSettingsValues((prev) => ({ ...prev, [field.key]: Number(e.target.value) }))}
+                    placeholder={field.placeholder}
+                    className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] tabular-nums tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
+                  />
+                  {field.helperText && (
+                    <span className="mt-1 block text-[11px] tracking-[-0.32px] text-[#999999]">{field.helperText}</span>
+                  )}
+                </div>
+              )
+            }
+
+            if (field.type === "password") {
+              const visible = settingsPasswordVisible[field.key] ?? false
+              return (
+                <div key={field.key} className={field.halfWidth ? "" : "col-span-2"}>
+                  <label className="mb-1.5 block text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={visible ? "text" : "password"}
+                      value={String(settingsValues[field.key] ?? "")}
+                      onChange={(e) => setSettingsValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 pr-9 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSettingsPasswordVisible((prev) => ({ ...prev, [field.key]: !visible }))}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#999999] hover:text-[#666666]"
+                    >
+                      {visible ? <EyeOff className="size-4" strokeWidth={2} /> : <Eye className="size-4" strokeWidth={2} />}
+                    </button>
+                  </div>
+                  {field.helperText && (
+                    <span className="mt-1 block text-[11px] tracking-[-0.32px] text-[#999999]">{field.helperText}</span>
+                  )}
+                </div>
+              )
+            }
+
+            return (
+              <div key={field.key} className={field.halfWidth ? "" : "col-span-2"}>
+                <label className="mb-1.5 block text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                  {field.label}
+                </label>
+                <input
+                  type="text"
+                  value={String(settingsValues[field.key] ?? "")}
+                  onChange={(e) => setSettingsValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                  placeholder={field.placeholder}
+                  className="h-9 w-full rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none"
+                />
+                {field.helperText && (
+                  <span className="mt-1 block text-[11px] tracking-[-0.32px] text-[#999999]">{field.helperText}</span>
+                )}
+              </div>
+            )
+          }
+
+          return (
+            <DialogContent className="sm:max-w-2xl" showCloseButton>
+              <DialogHeader>
+                <DialogTitle className="text-[18px] font-bold tracking-[-0.32px] text-[#181925]">
+                  {settingsTarget.name} Settings
+                </DialogTitle>
+                <DialogDescription className="text-[14px] tracking-[-0.32px] text-[#666666]">
+                  {config.description}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="flex flex-col gap-5">
+                {sections.map((section, sIdx) => (
+                  <div key={section.name || sIdx}>
+                    {section.name && (
+                      <div className={`flex items-center gap-3 ${sIdx > 0 ? "pt-1" : ""} pb-3`}>
+                        {sIdx > 0 && <div className="h-px flex-1 bg-[rgba(0,0,0,0.06)]" />}
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#999999]">
+                          {section.name}
+                        </span>
+                        <div className="h-px flex-1 bg-[rgba(0,0,0,0.06)]" />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                      {section.fields.map(renderField)}
+                    </div>
+                  </div>
+                ))}
+
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    onClick={() => setSettingsTarget(null)}
+                    className="flex h-8 items-center rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-4 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveSettings}
+                    className="flex h-8 items-center rounded-full bg-[#918DF6] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#9580FF]"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </DialogContent>
+          )
+        })()}
       </Dialog>
     </DashboardLayout>
   )

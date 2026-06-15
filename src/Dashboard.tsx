@@ -1,19 +1,11 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   TrendingUp,
   TrendingDown,
   ArrowRight,
-  Copy,
-  Check,
 } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer } from "recharts"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog"
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts"
 import DashboardLayout from "@/DashboardLayout"
 import {
   type Order,
@@ -27,11 +19,13 @@ import {
 
 // ─── Mock Data ───────────────────────────────────────────────
 
+const sparkDates = ["4/22", "4/23", "4/24", "4/25", "4/26", "4/27", "4/28"]
+
 const sparklineData = {
-  orders: [180, 220, 195, 240, 280, 310, 290].map((v, i) => ({ v, i })),
-  revenue: [5420, 6180, 5890, 7340, 8120, 9450, 7990].map((v, i) => ({ v, i })),
-  success: [99.2, 99.5, 99.3, 99.8, 99.6, 99.9, 99.7].map((v, i) => ({ v, i })),
-  delivery: [3.1, 2.8, 2.9, 2.5, 2.6, 2.3, 2.4].map((v, i) => ({ v, i })),
+  orders: [180, 220, 195, 240, 280, 310, 290].map((v, i) => ({ v, date: sparkDates[i] })),
+  revenue: [5420, 6180, 5890, 7340, 8120, 9450, 7990].map((v, i) => ({ v, date: sparkDates[i] })),
+  success: [99.2, 99.5, 99.3, 99.8, 99.6, 99.9, 99.7].map((v, i) => ({ v, date: sparkDates[i] })),
+  delivery: [3.1, 2.8, 2.9, 2.5, 2.6, 2.3, 2.4].map((v, i) => ({ v, date: sparkDates[i] })),
 }
 
 const platformData = [
@@ -42,12 +36,12 @@ const platformData = [
 ]
 
 const orders: Order[] = [
-  { id: "4X7PA", platform: "Naver Store", amount: 29.99, status: "Delivered", time: "2분 전", product: "캔바 프로 Canva PRO 12개월", customer: "이정효", email: "leolee12@naver.com", delivery: "Telegram", keyCode: "XXXX-XXXX-7F3M" },
-  { id: "9K2BM", platform: "G2G", amount: 42.99, status: "Delivered", time: "8분 전", product: "Steam Wallet $50 Gift Card", customer: "Alex Turner", email: "g2g_buyer_8821", delivery: "Email", keyCode: "XXXX-XXXX-A2K9" },
-  { id: "3F8QN", platform: "G2A", amount: 12.99, status: "Processing", time: "15분 전", product: "Xbox Game Pass Ultimate 1개월", customer: "김수현", email: "g2a_user_3347", delivery: "SMS", keyCode: "XXXX-XXXX-9D1P" },
-  { id: "7W1DL", platform: "Naver Store", amount: 24.99, status: "Delivered", time: "23분 전", product: "Windows 11 Pro Key", customer: "박민지", email: "minji_park@naver.com", delivery: "Email", keyCode: "XXXX-XXXX-QW8E" },
-  { id: "6R5VC", platform: "G2G", amount: 59.99, status: "Delivered", time: "41분 전", product: "Elden Ring Shadow of the Erdtree DLC", customer: "James Kim", email: "g2g_buyer_1204", delivery: "Telegram", keyCode: "XXXX-XXXX-5TN2" },
-  { id: "2H9TE", platform: "G2A", amount: 49.99, status: "Failed", time: "1시간 전", product: "FIFA 25 Ultimate Edition", customer: "최영호", email: "g2a_user_7790", delivery: "WhatsApp", keyCode: "XXXX-XXXX-0000", errorStep: "Step 3 — Key Delivery", errorMessage: "WhatsApp API timeout: recipient unreachable after 3 retries. Key reserved but not delivered." },
+  { id: "4X7PA", platform: "Naver Store", storeName: "건렬이의 디지털스토어", amount: 29.99, status: "Delivered", time: "2분 전", product: "캔바 프로 Canva PRO 12개월", customer: "이정효", email: "leolee12@naver.com", phone: "010-9803-2514", delivery: "Telegram", deliveryTarget: "@mont_delivery_bot", keyCode: "XXXX-XXXX-7F3M", recipientName: "이정효", recipientPhone: "010-9803-2514", customerMemo: "leolee12@naver.com", adminMemo: "", quantity: 1, items: [{ keyCode: "XXXX-XXXX-7F3M", status: "Delivered" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.3s", deliverySent: "1.2s", deliveryConfirmed: "2.1s" } },
+  { id: "9K2BM", platform: "G2G", storeName: "G2G Marketplace", amount: 42.99, status: "Delivered", time: "8분 전", product: "Steam Wallet $50 Gift Card", customer: "Alex Turner", email: "g2g_buyer_8821", phone: "010-3421-7788", delivery: "Email", deliveryTarget: "g2g_buyer_8821", keyCode: "XXXX-XXXX-A2K9", recipientName: "Alex Turner", recipientPhone: "010-3421-7788", customerMemo: "g2g_buyer_8821", adminMemo: "", quantity: 1, items: [{ keyCode: "XXXX-XXXX-A2K9", status: "Delivered" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.5s", deliverySent: "1.8s", deliveryConfirmed: "3.0s" } },
+  { id: "3F8QN", platform: "G2A", storeName: "G2A Marketplace", amount: 12.99, status: "Processing", time: "15분 전", product: "Xbox Game Pass Ultimate 1개월", customer: "김수현", email: "g2a_user_3347", phone: "010-5567-1234", delivery: "SMS", deliveryTarget: "010-5567-1234", keyCode: "XXXX-XXXX-9D1P", recipientName: "김수현", recipientPhone: "010-5567-1234", customerMemo: "", adminMemo: "", quantity: 1, items: [{ keyCode: "XXXX-XXXX-9D1P", status: "Processing" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.4s", deliverySent: "1.1s" } },
+  { id: "7W1DL", platform: "Naver Store", storeName: "몽키디지털", amount: 24.99, status: "Delivered", time: "23분 전", product: "Windows 11 Pro Key", customer: "박민지", email: "minji_park@naver.com", phone: "010-8812-3390", delivery: "Email", deliveryTarget: "minji_park@naver.com", keyCode: "XXXX-XXXX-QW8E", recipientName: "박민지", recipientPhone: "010-8812-3390", customerMemo: "minji_park@naver.com", adminMemo: "", quantity: 1, items: [{ keyCode: "XXXX-XXXX-QW8E", status: "Delivered" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.2s", deliverySent: "0.9s", deliveryConfirmed: "1.5s" } },
+  { id: "6R5VC", platform: "G2G", storeName: "G2G Marketplace", amount: 59.99, status: "Delivered", time: "41분 전", product: "Elden Ring Shadow of the Erdtree DLC", customer: "James Kim", email: "g2g_buyer_1204", phone: "010-2290-4567", delivery: "Telegram", deliveryTarget: "@mont_delivery_bot", keyCode: "XXXX-XXXX-5TN2", recipientName: "James Kim", recipientPhone: "010-2290-4567", customerMemo: "", adminMemo: "", quantity: 1, items: [{ keyCode: "XXXX-XXXX-5TN2", status: "Delivered" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.6s", deliverySent: "2.1s", deliveryConfirmed: "3.4s" } },
+  { id: "2H9TE", platform: "G2A", storeName: "G2A Marketplace", amount: 49.99, status: "Failed", time: "1시간 전", product: "FIFA 25 Ultimate Edition", customer: "최영호", email: "g2a_user_7790", phone: "010-7741-9023", delivery: "WhatsApp", deliveryTarget: "+82 10-7741-9023", keyCode: "XXXX-XXXX-0000", recipientName: "최영호", recipientPhone: "010-7741-9023", customerMemo: "g2a_user_7790", adminMemo: "WhatsApp 재발송 필요", errorStep: "Step 3 — Key Delivery", errorMessage: "WhatsApp API timeout: recipient unreachable after 3 retries. Key reserved but not delivered.", quantity: 1, items: [{ keyCode: "XXXX-XXXX-0000", status: "Failed" }], flowTiming: { orderCreated: "0.0s", licenseAssigned: "0.4s", deliverySent: "1.5s" } },
 ]
 
 const inventory = [
@@ -61,9 +55,44 @@ const inventory = [
 
 // ─── Sparkline ───────────────────────────────────────────────
 
-function Sparkline({ data, color }: { data: { v: number; i: number }[]; color: string }) {
+function SparklineTooltipContent({
+  active,
+  payload,
+  formatter,
+}: {
+  active?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: ReadonlyArray<Record<string, any>>
+  formatter: (value: number) => string
+}) {
+  if (!active || !payload?.length) return null
+  const entry = payload[0]
+  const value = typeof entry.value === "number" ? entry.value : 0
+  const date = typeof entry.payload?.date === "string" ? entry.payload.date : ""
   return (
-    <ResponsiveContainer width="100%" height={40}>
+    <div
+      className="rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 py-1.5"
+      style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+    >
+      <p className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{date}</p>
+      <p className="text-[13px] font-semibold tracking-[-0.32px] tabular-nums text-[#181925]">
+        {formatter(value)}
+      </p>
+    </div>
+  )
+}
+
+function Sparkline({
+  data,
+  color,
+  formatter,
+}: {
+  data: { v: number; date: string }[]
+  color: string
+  formatter: (value: number) => string
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={64}>
       <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id={`spark-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
@@ -71,6 +100,19 @@ function Sparkline({ data, color }: { data: { v: number; i: number }[]; color: s
             <stop offset="100%" stopColor={color} stopOpacity={0.02} />
           </linearGradient>
         </defs>
+        <XAxis
+          dataKey="date"
+          tickLine={false}
+          axisLine={false}
+          tick={{ fontSize: 11, fill: "#999999", fontFamily: "Plus Jakarta Sans Variable, system-ui, sans-serif" }}
+          interval="preserveStartEnd"
+        />
+        <Tooltip
+          content={({ active, payload }) => (
+            <SparklineTooltipContent active={active} payload={payload} formatter={formatter} />
+          )}
+          cursor={false}
+        />
         <Area
           type="monotone"
           dataKey="v"
@@ -78,6 +120,7 @@ function Sparkline({ data, color }: { data: { v: number; i: number }[]; color: s
           strokeWidth={1.5}
           fill={`url(#spark-${color.replace("#", "")})`}
           dot={false}
+          activeDot={{ r: 3, stroke: "#ffffff", strokeWidth: 2, fill: color }}
           isAnimationActive={false}
         />
       </AreaChart>
@@ -95,14 +138,16 @@ function MetricCard({
   positive,
   sparkData,
   secondaryValue,
+  formatter,
 }: {
   label: string
   value: string
   change: string
   dotColor: string
   positive: boolean
-  sparkData: { v: number; i: number }[]
+  sparkData: { v: number; date: string }[]
   secondaryValue?: string
+  formatter: (value: number) => string
 }) {
   return (
     <div
@@ -140,7 +185,7 @@ function MetricCard({
         </p>
       )}
       <div className="mt-1">
-        <Sparkline data={sparkData} color={dotColor} />
+        <Sparkline data={sparkData} color={dotColor} formatter={formatter} />
       </div>
     </div>
   )
@@ -149,15 +194,8 @@ function MetricCard({
 // ─── Dashboard ───────────────────────────────────────────────
 
 export default function Dashboard() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const navigate = useNavigate()
   const [currency, setCurrency] = useState<Currency>("KRW")
-  const [copiedKey, setCopiedKey] = useState(false)
-
-  const handleCopyKey = (key: string) => {
-    void navigator.clipboard.writeText(key)
-    setCopiedKey(true)
-    setTimeout(() => setCopiedKey(false), 1500)
-  }
 
   return (
     <DashboardLayout
@@ -166,7 +204,6 @@ export default function Dashboard() {
       onCurrencyToggle={() => setCurrency(currency === "USD" ? "KRW" : "USD")}
     >
         <div className="flex flex-1 flex-col gap-4 px-6 pt-4 pb-4 lg:px-8">
-          {/* KPI Metrics — 4 cards */}
           <div className="grid shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="Total Orders"
@@ -175,6 +212,7 @@ export default function Dashboard() {
               dotColor="#1A73E8"
               positive
               sparkData={sparklineData.orders}
+              formatter={(v) => `${v.toLocaleString()} orders`}
             />
             <MetricCard
               label="Revenue"
@@ -184,6 +222,7 @@ export default function Dashboard() {
               positive
               sparkData={sparklineData.revenue}
               secondaryValue={currency === "KRW" ? "≈ $48,392" : "≈ ₩70,168,800"}
+              formatter={(v) => currency === "KRW" ? formatKRW(v) : formatUSD(v)}
             />
             <MetricCard
               label="Delivery Success"
@@ -192,6 +231,7 @@ export default function Dashboard() {
               dotColor="#34A853"
               positive
               sparkData={sparklineData.success}
+              formatter={(v) => `${v}%`}
             />
             <MetricCard
               label="Avg Delivery Time"
@@ -200,12 +240,11 @@ export default function Dashboard() {
               dotColor="#918DF6"
               positive={false}
               sparkData={sparklineData.delivery}
+              formatter={(v) => `${v}s`}
             />
           </div>
 
-          {/* Main content: Orders table + Platform Split side by side */}
           <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
-            {/* Recent Orders */}
             <div
               className="flex flex-col overflow-hidden rounded-xl border border-[rgba(0,0,0,0.08)] bg-white"
               style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}
@@ -219,7 +258,10 @@ export default function Dashboard() {
                     Last 6 transactions
                   </p>
                 </div>
-                <button className="flex items-center gap-1 text-[13px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:text-[#9580FF]">
+                <button
+                  onClick={() => navigate("/dashboard/orders")}
+                  className="flex items-center gap-1 text-[13px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:text-[#9580FF]"
+                >
                   View all
                   <ArrowRight className="size-3.5" strokeWidth={2} />
                 </button>
@@ -247,21 +289,19 @@ export default function Dashboard() {
                       <button
                         key={order.id}
                         type="button"
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => navigate(`/dashboard/orders?order=${order.id}`)}
                         className={`flex w-full flex-col rounded-xl border border-[rgba(0,0,0,0.08)] p-4 text-left transition-colors hover:bg-neutral-50/60 ${
-                          order.status === "Failed" ? "bg-[#D93025]/[0.03]" : "bg-white"
+                          order.status === "Failed" ? "bg-[#D93025]/[0.06] border-[#D93025]/25" : "bg-white"
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="min-w-0 truncate text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">
+                        <div className="flex items-start gap-2">
+                          <p className="min-w-0 flex-1 text-[15px] font-semibold leading-snug tracking-[-0.32px] text-[#181925]">
                             {order.product}
                           </p>
-                          <div className="flex shrink-0 flex-col items-end gap-1">
-                            <StatusBadge status={order.status} />
-                            <DeliveryChannel channel={order.delivery} />
-                          </div>
+                          <StatusBadge status={order.status} />
                         </div>
-                        <div className="mt-2 flex items-center gap-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <DeliveryChannel channel={order.delivery} />
                           <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</span>
                           <span className="text-[#999999]">·</span>
                           {badge && (
@@ -273,7 +313,7 @@ export default function Dashboard() {
                           <span className="text-[#999999]">·</span>
                           <span className="text-[12px] tracking-[-0.32px] text-[#999999]">{order.time}</span>
                         </div>
-                        <div className="mt-2 flex items-center justify-between">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
                           <div className="flex items-baseline gap-1.5">
                             <span className="text-[15px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
                               {formatUSD(order.amount)}
@@ -285,7 +325,7 @@ export default function Dashboard() {
                             )}
                           </div>
                           {order.status === "Failed" && order.errorMessage && (
-                            <span className="inline-flex items-center truncate rounded-lg bg-[#D93025]/8 px-3 py-1 text-[13px] font-semibold tracking-[-0.2px] text-[#D93025]">
+                            <span className="inline-flex items-center rounded-lg bg-[#D93025]/8 px-3 py-1 text-[13px] font-semibold tracking-[-0.2px] text-[#D93025]">
                               {order.errorStep}
                             </span>
                           )}
@@ -297,7 +337,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Right panel */}
             <div className="flex flex-col gap-4 overflow-y-auto">
               <div
                 className="rounded-xl border border-[rgba(0,0,0,0.08)] bg-white px-5 pt-4 pb-5"
@@ -371,137 +410,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* Order Detail Modal */}
-        <Dialog open={selectedOrder !== null} onOpenChange={(open) => { if (!open) { setSelectedOrder(null); setCopiedKey(false) } }}>
-          {selectedOrder && (
-            <DialogContent className="sm:max-w-md" showCloseButton>
-              <DialogHeader>
-                <DialogTitle className="text-[18px] font-bold tracking-[-0.32px] text-[#181925]">
-                  Order #{selectedOrder.id}
-                </DialogTitle>
-                <DialogDescription className="text-[14px] tracking-[-0.32px] text-[#666666]">
-                  {selectedOrder.product}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="flex flex-col gap-4">
-                {/* Status & Amount */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Status</p>
-                    <div className="mt-1">
-                      <StatusBadge status={selectedOrder.status} />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Amount</p>
-                    <p className="mt-1 text-[16px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
-                      {formatUSD(selectedOrder.amount)}
-                      <span className="ml-1.5 text-[12px] font-medium text-[#999999]">
-                        (≈ {formatKRW(selectedOrder.amount)})
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
-
-                {/* Error Details (Failed orders only) */}
-                {selectedOrder.status === "Failed" && selectedOrder.errorMessage && (
-                  <>
-                    <div className="rounded-lg border border-[#D93025]/15 bg-[#D93025]/[0.04] px-4 py-3">
-                      <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#D93025]">
-                        {selectedOrder.errorStep}
-                      </p>
-                      <p className="mt-1.5 text-[12px] leading-relaxed tracking-[-0.32px] text-[#666666]">
-                        {selectedOrder.errorMessage}
-                      </p>
-                    </div>
-                    <div className="h-px bg-[rgba(0,0,0,0.08)]" />
-                  </>
-                )}
-
-                {/* Customer */}
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Customer</p>
-                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2.5">
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Name</p>
-                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.customer}</p>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Email</p>
-                      <p className="mt-0.5 truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.email}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Platform</p>
-                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.platform}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
-
-                {/* Delivery */}
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Delivery</p>
-                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2.5">
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Method</p>
-                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedOrder.delivery}</p>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Delivered at</p>
-                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">Apr 25, 2026 · {selectedOrder.time}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Key Code</p>
-                      <div className="mt-0.5 flex items-center gap-2">
-                        <p className="text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{selectedOrder.keyCode}</p>
-                        <button
-                          onClick={() => handleCopyKey(selectedOrder.keyCode)}
-                          className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-[rgba(0,0,0,0.06)]"
-                        >
-                          {copiedKey ? (
-                            <Check className="size-3.5 text-[#34A853]" strokeWidth={2.5} />
-                          ) : (
-                            <Copy className="size-3.5 text-[#999999]" strokeWidth={2} />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px bg-[rgba(0,0,0,0.08)]" />
-
-                {/* Transaction */}
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">Transaction</p>
-                  <div className="mt-2 grid grid-cols-3 gap-x-4 gap-y-2.5">
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Order ID</p>
-                      <p className="mt-0.5 text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{selectedOrder.id}</p>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Platform Fee</p>
-                      <p className="mt-0.5 text-[13px] font-medium tabular-nums tracking-[-0.32px] text-[#181925]">
-                        {formatUSD(selectedOrder.amount * 0.05)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">Net Revenue</p>
-                      <p className="mt-0.5 text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#34A853]">
-                        {formatUSD(selectedOrder.amount * 0.95)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          )}
-        </Dialog>
     </DashboardLayout>
   )
 }

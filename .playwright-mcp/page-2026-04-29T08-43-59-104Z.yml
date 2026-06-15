@@ -1,0 +1,222 @@
+- main [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button [ref=e7]:
+        - img
+      - heading "Orders" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Search... ⌘K" [ref=e10]:
+        - generic [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e15]: Search...
+        - generic [ref=e16]: ⌘K
+      - button "₩ KRW" [ref=e17]:
+        - generic [ref=e18]: ₩
+        - text: KRW
+  - generic [ref=e20]:
+    - generic [ref=e22]:
+      - img
+      - textbox "Search orders... Try \"status:failed\" or \"sms:010-1234\"" [ref=e23]
+    - table [ref=e25]:
+      - rowgroup [ref=e26]:
+        - row "Order ID Product Customer Platform Amount Status Delivery Time" [ref=e27]:
+          - columnheader "Order ID" [ref=e28]
+          - columnheader "Product" [ref=e29]
+          - columnheader "Customer" [ref=e30]
+          - columnheader "Platform" [ref=e31]
+          - columnheader "Amount" [ref=e32]
+          - columnheader "Status" [ref=e33]
+          - columnheader "Delivery" [ref=e34]
+          - columnheader "Time" [ref=e35]
+      - rowgroup [ref=e36]:
+        - row "#4X7PA 캔바 프로 Canva PRO 12개월 이정효 N Naver Store $29.99 ₩43,486 Delivered Telegram 2분 전" [ref=e37] [cursor=pointer]:
+          - cell "#4X7PA" [ref=e38]
+          - cell "캔바 프로 Canva PRO 12개월" [ref=e39]:
+            - paragraph [ref=e40]: 캔바 프로 Canva PRO 12개월
+          - cell "이정효" [ref=e41]
+          - cell "N Naver Store" [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: "N"
+              - generic [ref=e45]: Naver Store
+          - cell "$29.99 ₩43,486" [ref=e46]:
+            - text: $29.99
+            - paragraph [ref=e47]: ₩43,486
+          - cell "Delivered" [ref=e48]:
+            - generic [ref=e49]: Delivered
+          - cell "Telegram" [ref=e50]:
+            - generic [ref=e51]:
+              - img [ref=e52]
+              - text: Telegram
+          - cell "2분 전" [ref=e54]
+        - row "#9K2BM Steam Wallet $50 Gift Card Alex Turner G2G G2G $42.99 ₩62,336 Delivered Email 8분 전" [ref=e55] [cursor=pointer]:
+          - cell "#9K2BM" [ref=e56]
+          - cell "Steam Wallet $50 Gift Card" [ref=e57]:
+            - paragraph [ref=e58]: Steam Wallet $50 Gift Card
+          - cell "Alex Turner" [ref=e59]
+          - cell "G2G G2G" [ref=e60]:
+            - generic [ref=e61]:
+              - generic [ref=e62]: G2G
+              - generic [ref=e63]: G2G
+          - cell "$42.99 ₩62,336" [ref=e64]:
+            - text: $42.99
+            - paragraph [ref=e65]: ₩62,336
+          - cell "Delivered" [ref=e66]:
+            - generic [ref=e67]: Delivered
+          - cell "Email" [ref=e68]:
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - text: Email
+          - cell "8분 전" [ref=e73]
+        - row "#3F8QN Xbox Game Pass Ultimate 1개월 김수현 G2A G2A $12.99 ₩18,836 Processing SMS 15분 전" [ref=e74] [cursor=pointer]:
+          - cell "#3F8QN" [ref=e75]
+          - cell "Xbox Game Pass Ultimate 1개월" [ref=e76]:
+            - paragraph [ref=e77]: Xbox Game Pass Ultimate 1개월
+          - cell "김수현" [ref=e78]
+          - cell "G2A G2A" [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: G2A
+              - generic [ref=e82]: G2A
+          - cell "$12.99 ₩18,836" [ref=e83]:
+            - text: $12.99
+            - paragraph [ref=e84]: ₩18,836
+          - cell "Processing" [ref=e85]:
+            - generic [ref=e86]: Processing
+          - cell "SMS" [ref=e87]:
+            - generic [ref=e88]:
+              - img [ref=e89]
+              - text: SMS
+          - cell "15분 전" [ref=e91]
+        - row "#7W1DL Windows 11 Pro Key 박민지 N Naver Store $24.99 ₩36,236 Delivered Email 23분 전" [ref=e92] [cursor=pointer]:
+          - cell "#7W1DL" [ref=e93]
+          - cell "Windows 11 Pro Key" [ref=e94]:
+            - paragraph [ref=e95]: Windows 11 Pro Key
+          - cell "박민지" [ref=e96]
+          - cell "N Naver Store" [ref=e97]:
+            - generic [ref=e98]:
+              - generic [ref=e99]: "N"
+              - generic [ref=e100]: Naver Store
+          - cell "$24.99 ₩36,236" [ref=e101]:
+            - text: $24.99
+            - paragraph [ref=e102]: ₩36,236
+          - cell "Delivered" [ref=e103]:
+            - generic [ref=e104]: Delivered
+          - cell "Email" [ref=e105]:
+            - generic [ref=e106]:
+              - img [ref=e107]
+              - text: Email
+          - cell "23분 전" [ref=e110]
+        - row "#6R5VC Elden Ring Shadow of the Erdtree DLC James Kim G2G G2G $59.99 ₩86,986 Delivered Telegram 41분 전" [ref=e111] [cursor=pointer]:
+          - cell "#6R5VC" [ref=e112]
+          - cell "Elden Ring Shadow of the Erdtree DLC" [ref=e113]:
+            - paragraph [ref=e114]: Elden Ring Shadow of the Erdtree DLC
+          - cell "James Kim" [ref=e115]
+          - cell "G2G G2G" [ref=e116]:
+            - generic [ref=e117]:
+              - generic [ref=e118]: G2G
+              - generic [ref=e119]: G2G
+          - cell "$59.99 ₩86,986" [ref=e120]:
+            - text: $59.99
+            - paragraph [ref=e121]: ₩86,986
+          - cell "Delivered" [ref=e122]:
+            - generic [ref=e123]: Delivered
+          - cell "Telegram" [ref=e124]:
+            - generic [ref=e125]:
+              - img [ref=e126]
+              - text: Telegram
+          - cell "41분 전" [ref=e128]
+        - row "#2H9TE FIFA 25 Ultimate Edition 최영호 G2A G2A $49.99 ₩72,486 Failed WhatsApp 1시간 전" [ref=e129] [cursor=pointer]:
+          - cell "#2H9TE" [ref=e130]
+          - cell "FIFA 25 Ultimate Edition" [ref=e131]:
+            - paragraph [ref=e132]: FIFA 25 Ultimate Edition
+          - cell "최영호" [ref=e133]
+          - cell "G2A G2A" [ref=e134]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: G2A
+              - generic [ref=e137]: G2A
+          - cell "$49.99 ₩72,486" [ref=e138]:
+            - text: $49.99
+            - paragraph [ref=e139]: ₩72,486
+          - cell "Failed" [ref=e140]:
+            - generic [ref=e141]: Failed
+          - cell "WhatsApp" [ref=e142]:
+            - generic [ref=e143]:
+              - img [ref=e144]
+              - text: WhatsApp
+          - cell "1시간 전" [ref=e146]
+        - row "#8M3KP Adobe Creative Cloud 1개월 정하은 N Naver Store $34.99 ₩50,736 Delivered Email 1시간 전" [ref=e147] [cursor=pointer]:
+          - cell "#8M3KP" [ref=e148]
+          - cell "Adobe Creative Cloud 1개월" [ref=e149]:
+            - paragraph [ref=e150]: Adobe Creative Cloud 1개월
+          - cell "정하은" [ref=e151]
+          - cell "N Naver Store" [ref=e152]:
+            - generic [ref=e153]:
+              - generic [ref=e154]: "N"
+              - generic [ref=e155]: Naver Store
+          - cell "$34.99 ₩50,736" [ref=e156]:
+            - text: $34.99
+            - paragraph [ref=e157]: ₩50,736
+          - cell "Delivered" [ref=e158]:
+            - generic [ref=e159]: Delivered
+          - cell "Email" [ref=e160]:
+            - generic [ref=e161]:
+              - img [ref=e162]
+              - text: Email
+          - cell "1시간 전" [ref=e165]
+        - row "#1Q6WJ Minecraft Java Edition David Park G2G G2G $19.99 ₩28,985 Delivered Telegram 2시간 전" [ref=e166] [cursor=pointer]:
+          - cell "#1Q6WJ" [ref=e167]
+          - cell "Minecraft Java Edition" [ref=e168]:
+            - paragraph [ref=e169]: Minecraft Java Edition
+          - cell "David Park" [ref=e170]
+          - cell "G2G G2G" [ref=e171]:
+            - generic [ref=e172]:
+              - generic [ref=e173]: G2G
+              - generic [ref=e174]: G2G
+          - cell "$19.99 ₩28,985" [ref=e175]:
+            - text: $19.99
+            - paragraph [ref=e176]: ₩28,985
+          - cell "Delivered" [ref=e177]:
+            - generic [ref=e178]: Delivered
+          - cell "Telegram" [ref=e179]:
+            - generic [ref=e180]:
+              - img [ref=e181]
+              - text: Telegram
+          - cell "2시간 전" [ref=e183]
+        - row "#5T4NR Cyberpunk 2077 Ultimate Bundle 이서연 D Direct $89.99 ₩130,485 Delivered Email 2시간 전" [ref=e184] [cursor=pointer]:
+          - cell "#5T4NR" [ref=e185]
+          - cell "Cyberpunk 2077 Ultimate Bundle" [ref=e186]:
+            - paragraph [ref=e187]: Cyberpunk 2077 Ultimate Bundle
+          - cell "이서연" [ref=e188]
+          - cell "D Direct" [ref=e189]:
+            - generic [ref=e190]:
+              - generic [ref=e191]: D
+              - generic [ref=e192]: Direct
+          - cell "$89.99 ₩130,485" [ref=e193]:
+            - text: $89.99
+            - paragraph [ref=e194]: ₩130,485
+          - cell "Delivered" [ref=e195]:
+            - generic [ref=e196]: Delivered
+          - cell "Email" [ref=e197]:
+            - generic [ref=e198]:
+              - img [ref=e199]
+              - text: Email
+          - cell "2시간 전" [ref=e202]
+        - row "#0L8FD Netflix Gift Card $25 Tom Wilson G2A G2A $15.99 ₩23,186 Processing SMS 3시간 전" [ref=e203] [cursor=pointer]:
+          - cell "#0L8FD" [ref=e204]
+          - cell "Netflix Gift Card $25" [ref=e205]:
+            - paragraph [ref=e206]: Netflix Gift Card $25
+          - cell "Tom Wilson" [ref=e207]
+          - cell "G2A G2A" [ref=e208]:
+            - generic [ref=e209]:
+              - generic [ref=e210]: G2A
+              - generic [ref=e211]: G2A
+          - cell "$15.99 ₩23,186" [ref=e212]:
+            - text: $15.99
+            - paragraph [ref=e213]: ₩23,186
+          - cell "Processing" [ref=e214]:
+            - generic [ref=e215]: Processing
+          - cell "SMS" [ref=e216]:
+            - generic [ref=e217]:
+              - img [ref=e218]
+              - text: SMS
+          - cell "3시간 전" [ref=e220]
+    - img [ref=e223]

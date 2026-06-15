@@ -237,6 +237,7 @@ Manages orders, inventory, and instant delivery across Naver Store, G2G, G2A, an
 8. ❌ `shadow-2xl` on the navbar
 9. ❌ Using `Inter`, `Roboto`, `Arial`, or `Space Grotesk`
 10. ❌ Everything centered with perfect symmetry — add visual tension
+11. ❌ Inline expand/collapse or accordion on action buttons — when a user clicks an action (row, button, card), always open a new Dialog/popup, never expand content below the trigger
 
 ---
 

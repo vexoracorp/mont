@@ -1,18 +1,22 @@
 import { useState, useRef, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
   LayoutDashboard,
   ShoppingCart,
   Package,
   Database,
+  KeyRound,
   BarChart3,
   Settings,
   Menu,
-  Calendar,
   ChevronDown,
   Store,
   Check,
   Plus,
+  Building2,
+  Users,
+  Send,
+  Unplug,
 } from "lucide-react"
 import {
   Sheet,
@@ -21,6 +25,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import GlobalSearch from "@/GlobalSearch"
 import type { Currency } from "@/shared"
 
 const navItems = [
@@ -28,8 +33,13 @@ const navItems = [
   { label: "Orders", icon: ShoppingCart, href: "/dashboard/orders" },
   { label: "Products", icon: Package, href: "/dashboard/products" },
   { label: "Inventory", icon: Database, href: "/dashboard/inventory" },
+  { label: "Licenses", icon: KeyRound, href: "/dashboard/licenses" },
+  { label: "Providers", icon: Unplug, href: "/dashboard/providers" },
+  { label: "Customers", icon: Users, href: "/dashboard/customers" },
   { label: "Merchants", icon: Store, href: "/dashboard/merchants" },
   { label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
+  { label: "Channels", icon: Send, href: "/dashboard/channels" },
+  { label: "Workspace", icon: Building2, href: "/dashboard/workspace" },
   { label: "Settings", icon: Settings, href: "/dashboard/settings" },
 ]
 
@@ -47,9 +57,9 @@ const workspaces: Workspace[] = [
   { id: "devshop", name: "DevShop", plan: "Pro", platforms: 2, color: "#34A853" },
 ]
 
-function SidebarContent({ currentPath, activeWorkspace, onWorkspaceChange }: { currentPath: string; activeWorkspace: Workspace; onWorkspaceChange: (ws: Workspace) => void }) {
-  const mainNav = navItems.slice(0, 4)
-  const secondaryNav = navItems.slice(4)
+function SidebarContent({ currentPath, activeWorkspace, onWorkspaceChange, allWorkspaces, onCreateWorkspace }: { currentPath: string; activeWorkspace: Workspace; onWorkspaceChange: (ws: Workspace) => void; allWorkspaces: Workspace[]; onCreateWorkspace: () => void }) {
+  const mainNav = navItems.slice(0, 7)
+  const secondaryNav = navItems.slice(7)
   const [wsOpen, setWsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -161,7 +171,7 @@ function SidebarContent({ currentPath, activeWorkspace, onWorkspaceChange }: { c
               className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-xl border border-[rgba(0,0,0,0.08)] bg-white py-1.5"
               style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 8px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02)" }}
             >
-              {workspaces.map((ws) => (
+              {allWorkspaces.map((ws) => (
                 <button
                   key={ws.id}
                   onClick={() => { onWorkspaceChange(ws); setWsOpen(false) }}
@@ -184,7 +194,7 @@ function SidebarContent({ currentPath, activeWorkspace, onWorkspaceChange }: { c
                 </button>
               ))}
               <div className="mx-2 my-1.5 h-px bg-[rgba(0,0,0,0.06)]" />
-              <button className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[rgba(0,0,0,0.03)]">
+              <button onClick={() => { onCreateWorkspace(); setWsOpen(false) }} className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[rgba(0,0,0,0.03)]">
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-dashed border-[rgba(0,0,0,0.15)] text-[#999999]">
                   <Plus className="size-3.5" strokeWidth={2} />
                 </span>
@@ -224,19 +234,26 @@ export default function DashboardLayout({
   onCurrencyToggle: () => void
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [allWorkspaces] = useState<Workspace[]>(workspaces)
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace>(workspaces[0])
   const location = useLocation()
+
+  const navigateTo = useNavigate()
+
+  const handleOpenCreate = () => {
+    navigateTo("/dashboard/quick-setup")
+  }
 
   return (
     <div className="flex h-svh bg-[#F7F7F8]">
       <aside className="hidden w-[240px] shrink-0 border-r border-[rgba(0,0,0,0.08)] bg-[#F5F5F6] lg:block">
-        <SidebarContent currentPath={location.pathname} activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
+          <SidebarContent currentPath={location.pathname} activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} allWorkspaces={allWorkspaces} onCreateWorkspace={handleOpenCreate} />
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-[260px] bg-[#F5F5F6] p-0" showCloseButton={false}>
           <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <SidebarContent currentPath={location.pathname} activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
+        <SidebarContent currentPath={location.pathname} activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} allWorkspaces={allWorkspaces} onCreateWorkspace={handleOpenCreate} />
         </SheetContent>
       </Sheet>
 
@@ -264,10 +281,7 @@ export default function DashboardLayout({
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex h-8 items-center gap-2 rounded-full border border-[rgba(0,0,0,0.08)] bg-white px-3.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.02)]">
-              <Calendar className="size-3.5" strokeWidth={2} />
-              Apr 19 – Apr 25, 2026
-            </button>
+            <GlobalSearch />
             <button
               onClick={onCurrencyToggle}
               className={`flex h-8 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold tracking-[-0.32px] transition-colors ${
@@ -279,9 +293,7 @@ export default function DashboardLayout({
               <span className="tabular-nums">₩</span>
               KRW
             </button>
-            <Button className="hidden h-8 rounded-full bg-[#918DF6] px-4 text-[13px] font-medium text-white hover:bg-[#9580FF] sm:flex">
-              Export
-            </Button>
+
           </div>
         </header>
 

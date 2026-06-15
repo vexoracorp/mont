@@ -42,3 +42,7 @@ bun dev         # development server
 - No external image URLs — use local assets or SVG inline
 - Prefer CSS/Tailwind classes over inline styles
 - Keep components in `src/` — minimal file count
+
+## UI Rules
+
+- No inline expand/collapse or accordion patterns on action buttons. When a user clicks an action (row, button, card), always open a new Dialog/popup — never expand content below the trigger.

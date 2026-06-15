@@ -1,0 +1,197 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e10]: Mont
+      - navigation [ref=e11]:
+        - generic [ref=e12]:
+          - link "Overview" [ref=e13] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e14]
+            - text: Overview
+          - link "Orders" [ref=e19] [cursor=pointer]:
+            - /url: /dashboard/orders
+            - img [ref=e20]
+            - text: Orders
+          - link "Products" [ref=e24] [cursor=pointer]:
+            - /url: /dashboard/products
+            - img [ref=e25]
+            - text: Products
+          - link "Inventory" [ref=e29] [cursor=pointer]:
+            - /url: /dashboard/inventory
+            - img [ref=e30]
+            - text: Inventory
+          - link "Licenses" [ref=e34] [cursor=pointer]:
+            - /url: /dashboard/licenses
+            - img [ref=e36]
+            - text: Licenses
+          - link "Providers" [ref=e39] [cursor=pointer]:
+            - /url: /dashboard/providers
+            - img [ref=e40]
+            - text: Providers
+          - link "Customers" [ref=e47] [cursor=pointer]:
+            - /url: /dashboard/customers
+            - img [ref=e48]
+            - text: Customers
+        - generic [ref=e54]:
+          - link "Merchants" [ref=e55] [cursor=pointer]:
+            - /url: /dashboard/merchants
+            - img [ref=e56]
+            - text: Merchants
+          - link "Analytics" [ref=e60] [cursor=pointer]:
+            - /url: /dashboard/analytics
+            - img [ref=e61]
+            - text: Analytics
+          - link "Channels" [ref=e63] [cursor=pointer]:
+            - /url: /dashboard/channels
+            - img [ref=e64]
+            - text: Channels
+          - link "Workspace" [ref=e67] [cursor=pointer]:
+            - /url: /dashboard/workspace
+            - img [ref=e68]
+            - text: Workspace
+          - link "Settings" [ref=e72] [cursor=pointer]:
+            - /url: /dashboard/settings
+            - img [ref=e73]
+            - text: Settings
+      - generic [ref=e76]:
+        - button "Vexora Store Pro 3 platforms" [ref=e78]:
+          - generic [ref=e81]:
+            - paragraph [ref=e82]: Vexora Store
+            - generic [ref=e83]:
+              - generic [ref=e84]: Pro
+              - generic [ref=e85]: 3 platforms
+          - img [ref=e86]
+        - generic [ref=e88]:
+          - generic [ref=e89]: YC
+          - generic [ref=e90]:
+            - paragraph [ref=e91]: Yuchan
+            - paragraph [ref=e92]: yuchan@vexora.team
+  - main [ref=e93]:
+    - generic [ref=e94]:
+      - heading "License Charging" [level=1] [ref=e96]
+      - generic [ref=e97]:
+        - button "Search... ⌘K" [ref=e98]:
+          - generic [ref=e99]:
+            - img [ref=e100]
+            - generic [ref=e103]: Search...
+          - generic [ref=e104]: ⌘K
+        - button "₩ KRW" [ref=e105]:
+          - generic [ref=e106]: ₩
+          - text: KRW
+    - generic [ref=e107]:
+      - paragraph [ref=e108]: Add and manage license keys for your products
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]: Product
+            - button "Select a product..." [ref=e114]:
+              - img [ref=e115]
+              - generic [ref=e119]: Select a product...
+              - img [ref=e120]
+          - generic [ref=e122]:
+            - generic [ref=e123]: Key Type
+            - generic [ref=e124]:
+              - button "Key Code" [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e129]: Key Code
+              - button "Link" [ref=e130]:
+                - img [ref=e131]
+                - generic [ref=e134]: Link
+              - button "File" [ref=e135]:
+                - img [ref=e136]
+                - generic [ref=e139]: File
+              - button "Image" [ref=e140]:
+                - img [ref=e141]
+                - generic [ref=e145]: Image
+              - button "Subscription" [ref=e146]:
+                - img [ref=e147]
+                - generic [ref=e152]: Subscription
+          - generic [ref=e153]:
+            - generic [ref=e155]: Key Codes
+            - textbox "Enter one key per line... XXXX-ABCD-1234-EFGH XXXX-IJKL-5678-MNOP" [ref=e156]:
+              - /placeholder: "Enter one key per line...\nXXXX-ABCD-1234-EFGH\nXXXX-IJKL-5678-MNOP"
+          - button "Add Keys" [disabled] [ref=e157]:
+            - img [ref=e158]
+            - text: Add Keys
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - generic [ref=e162]:
+                - img [ref=e163]
+                - paragraph [ref=e166]: Today
+              - paragraph [ref=e167]: "24"
+            - generic [ref=e168]:
+              - generic [ref=e169]:
+                - img [ref=e170]
+                - paragraph [ref=e173]: This Week
+              - paragraph [ref=e174]: "156"
+            - generic [ref=e175]:
+              - generic [ref=e176]:
+                - img [ref=e177]
+                - paragraph [ref=e181]: Top
+              - paragraph [ref=e182]: Steam Wallet $50
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - paragraph [ref=e185]: Recent Charges
+              - generic [ref=e186]: 5 of 25 entries loaded
+            - generic [ref=e187]:
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - paragraph [ref=e191]: Steam Wallet $50 Gift Card
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: +50 keys
+                    - generic [ref=e194]: ·
+                    - generic [ref=e195]: Key Code
+                    - generic [ref=e196]: ·
+                    - generic [ref=e197]: Bulk Import
+                - generic [ref=e198]:
+                  - paragraph [ref=e199]: 2026-04-29 09:12
+                  - paragraph [ref=e200]: You
+              - generic [ref=e202]:
+                - generic [ref=e203]:
+                  - paragraph [ref=e204]: Windows 11 Pro Key
+                  - generic [ref=e205]:
+                    - generic [ref=e206]: +25 keys
+                    - generic [ref=e207]: ·
+                    - generic [ref=e208]: Key Code
+                    - generic [ref=e209]: ·
+                    - generic [ref=e210]: API Fetch
+                - generic [ref=e211]:
+                  - paragraph [ref=e212]: 2026-04-29 08:45
+                  - paragraph [ref=e213]: You
+              - generic [ref=e215]:
+                - generic [ref=e216]:
+                  - paragraph [ref=e217]: Xbox Game Pass Ultimate 1M
+                  - generic [ref=e218]:
+                    - generic [ref=e219]: +10 keys
+                    - generic [ref=e220]: ·
+                    - generic [ref=e221]: Link
+                    - generic [ref=e222]: ·
+                    - generic [ref=e223]: Manual Upload
+                - generic [ref=e224]:
+                  - paragraph [ref=e225]: 2026-04-29 07:30
+                  - paragraph [ref=e226]: You
+              - generic [ref=e228]:
+                - generic [ref=e229]:
+                  - paragraph [ref=e230]: Spotify Premium 6M
+                  - generic [ref=e231]:
+                    - generic [ref=e232]: +15 keys
+                    - generic [ref=e233]: ·
+                    - generic [ref=e234]: Subscription
+                    - generic [ref=e235]: ·
+                    - generic [ref=e236]: Partner Supply
+                - generic [ref=e237]:
+                  - paragraph [ref=e238]: 2026-04-28 22:15
+                  - paragraph [ref=e239]: You
+              - generic [ref=e241]:
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Adobe Creative Cloud 1M
+                  - generic [ref=e244]:
+                    - generic [ref=e245]: +8 keys
+                    - generic [ref=e246]: ·
+                    - generic [ref=e247]: Key Code
+                    - generic [ref=e248]: ·
+                    - generic [ref=e249]: Manual Upload
+                - generic [ref=e250]:
+                  - paragraph [ref=e251]: 2026-04-28 18:40
+                  - paragraph [ref=e252]: You
