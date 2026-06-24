@@ -1,3 +1,7 @@
+if (import.meta.env.DEV) {
+  import("react-grab");
+}
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -7,6 +11,7 @@ import Login from './Login.tsx'
 import Signup from './Signup.tsx'
 import Dashboard from './Dashboard.tsx'
 import Orders from './Orders.tsx'
+import OrderDetail from './OrderDetail.tsx'
 import Products from './Products.tsx'
 import Inventory from './Inventory.tsx'
 import Licenses from './Licenses.tsx'
@@ -33,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/kr/signup" element={<Signup locale="kr" />} />
         <Route path="/kr/dashboard" element={<Dashboard locale="kr" />} />
         <Route path="/kr/dashboard/orders" element={<Orders locale="kr" />} />
+        <Route path="/kr/dashboard/orders/:orderId" element={<OrderDetail locale="kr" />} />
         <Route path="/kr/dashboard/products" element={<Products locale="kr" />} />
         <Route path="/kr/dashboard/inventory" element={<Inventory locale="kr" />} />
         <Route path="/kr/dashboard/licenses" element={<Licenses locale="kr" />} />
@@ -51,6 +57,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/orders" element={<Orders />} />
+        <Route path="/dashboard/orders/:orderId" element={<OrderDetail />} />
         <Route path="/dashboard/products" element={<Products />} />
         <Route path="/dashboard/inventory" element={<Inventory />} />
         <Route path="/dashboard/licenses" element={<Licenses />} />
