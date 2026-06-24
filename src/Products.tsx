@@ -577,28 +577,27 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                     )}
                   </div>
 
-                  <div className="mt-1.5 flex items-center gap-3">
-                    <div className="flex gap-1">
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <div className="flex items-center gap-0.5">
                       {product.platforms.map((platform) => {
                         const badge = platformBadges[platform]
                         if (!badge) return null
                         return (
-                          <span key={platform}>
-                            <PlatformBadgeIcon badge={badge} size="size-4" />
-                          </span>
+                          <PlatformBadgeIcon key={platform} badge={badge} size="size-3.5" />
                         )
                       })}
                     </div>
-                    <span className="text-[#CCCCCC]">·</span>
-                    <div className="flex items-center gap-1">
+                    <span className="text-[11px] text-[#CCCCCC]">·</span>
+                    <div className="flex items-center gap-0.5">
                       <Package className="size-3 text-[#999999]" strokeWidth={1.8} />
-                      <span className="text-[12px] tabular-nums tracking-[-0.32px] text-[#666666]">
+                      <span className="text-[11px] tabular-nums tracking-[-0.32px] text-[#666666]">
                         {product.stock}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <span className="text-[11px] text-[#CCCCCC]">·</span>
+                    <div className="flex items-center gap-0.5">
                       <TrendingUp className="size-3 text-[#999999]" strokeWidth={1.8} />
-                      <span className="text-[12px] tabular-nums tracking-[-0.32px] text-[#666666]">
+                      <span className="text-[11px] tabular-nums tracking-[-0.32px] text-[#666666]">
                         {product.totalSold.toLocaleString()}
                       </span>
                     </div>
@@ -641,7 +640,7 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                   <button
                     key={tab.value}
                     onClick={() => setDetailTab(tab.value)}
-                    className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium tracking-[-0.32px] transition-colors ${
+                    className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[14px] font-medium tracking-[-0.32px] transition-colors ${
                       detailTab === tab.value
                         ? "bg-[#918DF6]/[0.1] text-[#918DF6]"
                         : "text-[#666666] hover:text-[#181925]"
@@ -671,20 +670,20 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.price}</p>
+                      <p className="text-[14px] font-medium tracking-[-0.32px] text-[#999999]">{t.price}</p>
                       <p className="mt-1 text-[18px] font-bold tabular-nums tracking-[-0.32px] text-[#181925]">
                         {locale === "kr" ? formatKRW(selectedProduct.price) : formatUSD(selectedProduct.price)}
                       </p>
                       {locale === "en" && (
-                        <p className="text-[12px] font-medium tabular-nums tracking-[-0.32px] text-[#999999]">
+                        <p className="text-[14px] font-medium tabular-nums tracking-[-0.32px] text-[#999999]">
                           {formatKRW(selectedProduct.price)}
                         </p>
                       )}
                     </div>
                     <div>
-                      <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.status}</p>
+                      <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.status}</p>
                       <div className="mt-1">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[13px] font-semibold ${statusStyles[selectedProduct.status]}`}>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-[14px] font-semibold ${statusStyles[selectedProduct.status]}`}>
                           {getProductStatusLabel(selectedProduct.status, t)}
                         </span>
                       </div>
@@ -694,8 +693,8 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                   <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                   <div>
-                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.description}</p>
-                    <p className="mt-1 text-[13px] leading-relaxed tracking-[-0.32px] text-[#181925]">
+                    <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.description}</p>
+                    <p className="mt-1 text-[14px] leading-relaxed tracking-[-0.32px] text-[#181925]">
                       {selectedDisplay.description}
                     </p>
                   </div>
@@ -703,17 +702,17 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                   <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                   <div>
-                    <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.platforms}</p>
-                    <div className="mt-1.5 flex flex-wrap gap-2">
+                    <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.platforms}</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {selectedProduct.platforms.map((platform) => {
                         const badge = platformBadges[platform]
                         if (!badge) return null
                         return (
                           <span
                             key={platform}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.08)] px-2.5 py-1 text-[12px] font-medium tracking-[-0.32px] text-[#181925]"
+                            className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.08)] px-2 py-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]"
                           >
-                            <PlatformBadgeIcon badge={badge} size="size-3.5" />
+                            <PlatformBadgeIcon badge={badge} size="size-3" />
                             {platform}
                           </span>
                         )
@@ -724,22 +723,22 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                   <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                   <div>
-                    <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.inventorySales}</p>
+                      <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.inventorySales}</p>
                     <div className="mt-2 grid grid-cols-3 gap-x-4">
                       <div>
-                        <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.inStock}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.inStock}</p>
                         <p className="mt-0.5 text-[16px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
                           {selectedProduct.stock}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.totalSold}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.totalSold}</p>
                         <p className="mt-0.5 text-[16px] font-semibold tabular-nums tracking-[-0.32px] text-[#34A853]">
                           {selectedProduct.totalSold.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[12px] font-medium tracking-[-0.32px] text-[#999999]">{t.revenue}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.revenue}</p>
                         <p className="mt-0.5 text-[16px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">
                           {locale === "kr" ? formatKRW(selectedProduct.price * selectedProduct.totalSold) : formatUSD(selectedProduct.price * selectedProduct.totalSold)}
                         </p>
@@ -752,8 +751,8 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
               {detailTab === "orders" && (
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.recentOrders}</p>
-                    <span className="text-[11px] tabular-nums tracking-[-0.32px] text-[#999999]">{getMockOrders(selectedProduct.id).length} {t.orders}</span>
+                    <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.recentOrders}</p>
+                    <span className="text-[13px] tabular-nums tracking-[-0.32px] text-[#999999]">{getMockOrders(selectedProduct.id).length} {t.orders}</span>
                   </div>
                   <div className="flex flex-col gap-2">
                     {getMockOrders(selectedProduct.id).map((order) => {
@@ -766,22 +765,22 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                         >
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{order.orderId}</span>
-                              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${orderStatusStyles[order.status]}`}>
+                              <span className="text-[14px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{order.orderId}</span>
+                              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-semibold ${orderStatusStyles[order.status]}`}>
                                 {getOrderStatusLabel(order.status, t)}
                               </span>
                             </div>
                             <div className="mt-1 flex items-center gap-2">
-                              <span className="text-[12px] tracking-[-0.32px] text-[#666666]">{order.customer}</span>
+                              <span className="text-[13px] tracking-[-0.32px] text-[#666666]">{order.customer}</span>
                               <span className="text-[#CCCCCC]">·</span>
-                              <span className="text-[12px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{locale === "kr" ? formatKRW(order.amount) : formatUSD(order.amount)}</span>
+                              <span className="text-[13px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{locale === "kr" ? formatKRW(order.amount) : formatUSD(order.amount)}</span>
                               <span className="text-[#CCCCCC]">·</span>
                               {pBadge && (
                                 <PlatformBadgeIcon badge={pBadge} size="size-4" />
                               )}
                             </div>
                           </div>
-                          <span className="shrink-0 text-[11px] tabular-nums tracking-[-0.32px] text-[#999999]">{order.date}</span>
+                          <span className="shrink-0 text-[13px] tabular-nums tracking-[-0.32px] text-[#999999]">{order.date}</span>
                         </button>
                       )
                     })}
@@ -819,38 +818,38 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                             <div className="bg-[rgba(0,0,0,0.02)] px-6 py-5">
                               <div className="flex items-center justify-between gap-3">
                                 <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3">
-                                  <p className="text-[10px] font-semibold tracking-[-0.32px] text-[#999999]">{t.source}</p>
+                                  <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#999999]">{t.source}</p>
                                   <div className="flex items-center gap-1.5">
                                     {pBadge && <PlatformBadgeIcon badge={pBadge} size="size-4" />}
-                                    <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.platform}</span>
+                                    <span className="text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.platform}</span>
                                   </div>
-                                  <p className="max-w-full truncate text-[11px] tracking-[-0.32px] text-[#666666]">{order.platform}</p>
+                                  <p className="max-w-full truncate text-[13px] tracking-[-0.32px] text-[#666666]">{order.platform}</p>
                                 </div>
 
                                 <div className="flex shrink-0 flex-col items-center gap-0.5">
-                                  <span className="text-[10px] font-mono tabular-nums tracking-[-0.32px] text-[#999999] bg-[rgba(0,0,0,0.04)] rounded px-1.5 py-0.5">{"\u2014"}</span>
+                                  <span className="text-[12px] font-mono tabular-nums tracking-[-0.32px] text-[#999999] bg-[rgba(0,0,0,0.04)] rounded px-1.5 py-0.5">{"\u2014"}</span>
                                   <span className="text-[#999999]">&rarr;</span>
                                 </div>
 
                                 <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3">
-                                  <p className="text-[10px] font-semibold tracking-[-0.32px] text-[#999999]">{t.license}</p>
-                                  <p className="max-w-full truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{selectedDisplay.name}</p>
-                                  <p className="max-w-full truncate font-mono text-[11px] tracking-[-0.32px] text-[#666666]">{order.keyCode}</p>
+                                  <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#999999]">{t.license}</p>
+                                  <p className="max-w-full truncate text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{selectedDisplay.name}</p>
+                                  <p className="max-w-full truncate font-mono text-[13px] tracking-[-0.32px] text-[#666666]">{order.keyCode}</p>
                                 </div>
 
                                 <div className="flex shrink-0 flex-col items-center gap-0.5">
-                                  <span className="text-[10px] font-mono tabular-nums tracking-[-0.32px] text-[#999999] bg-[rgba(0,0,0,0.04)] rounded px-1.5 py-0.5">{"\u2014"}</span>
+                                  <span className="text-[12px] font-mono tabular-nums tracking-[-0.32px] text-[#999999] bg-[rgba(0,0,0,0.04)] rounded px-1.5 py-0.5">{"\u2014"}</span>
                                   <span className="text-[#999999]">&rarr;</span>
                                 </div>
 
                                 <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3">
-                                  <p className="text-[10px] font-semibold tracking-[-0.32px] text-[#999999]">{t.channel}</p>
+                                  <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#999999]">{t.channel}</p>
                                   <div className="flex items-center gap-1.5">
                                     {ch && <span style={{ color: ch.color }}>{ch.icon}</span>}
-                                    <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.delivery}</span>
+                                    <span className="text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.delivery}</span>
                                     <span className={`size-1.5 rounded-full ${statusDot}`} />
                                   </div>
-                                  <p className="max-w-full truncate text-[11px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || ""}</p>
+                                  <p className="max-w-full truncate text-[13px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || ""}</p>
                                 </div>
                               </div>
                             </div>
@@ -858,9 +857,9 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                             <div className="grid grid-cols-2 gap-0 divide-x divide-[rgba(0,0,0,0.08)]">
                               <div className="flex flex-col gap-5 p-6">
                                 <div>
-                                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.product}</p>
+                                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.product}</p>
                                   <p className="mt-2.5 text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{selectedDisplay.name}</p>
-                                   <p className="mt-1 text-[12px] tabular-nums tracking-[-0.32px] text-[#666666]">
+                                   <p className="mt-1 text-[13px] tabular-nums tracking-[-0.32px] text-[#666666]">
                                     {locale === "kr" ? formatKRW(order.amount) : `${formatKRW(order.amount)} (${formatUSD(order.amount)})`}
                                    </p>
                                 </div>
@@ -868,17 +867,17 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                 <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                                 <div>
-                                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.buyer}</p>
+                                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.buyer}</p>
                                   <div className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2">
                                     <div>
-                                      <p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.name}</p>
-                                      <p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</p>
+                                      <p className="text-[13px] tracking-[-0.32px] text-[#999999]">{t.name}</p>
+                                      <p className="mt-0.5 text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.platform}</p>
+                                      <p className="text-[13px] tracking-[-0.32px] text-[#999999]">{t.platform}</p>
                                       <div className="mt-0.5 flex items-center gap-1.5">
                                         {pBadge && <PlatformBadgeIcon badge={pBadge} size="size-3.5" />}
-                                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.platform}</p>
+                                        <p className="text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.platform}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -887,22 +886,22 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                 <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                                 <div>
-                                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.deliveryDetails}</p>
+                                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.deliveryDetails}</p>
                                   <div className="mt-2.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.015)]">
                                     <div className="flex items-center gap-2.5 border-b border-[rgba(0,0,0,0.06)] px-3.5 py-3">
                                       {ch && <span className="text-base" style={{ color: ch.color }}>{ch.icon}</span>}
                                       <div className="flex-1">
-                                        <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#181925]">{order.delivery}</p>
-                                        <p className="text-[11px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || "\u2014"}</p>
+                                        <p className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">{order.delivery}</p>
+                                        <p className="text-[13px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || "\u2014"}</p>
                                       </div>
                                       <div className="flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.06)] bg-white px-2 py-0.5">
                                         <span className={`size-1.5 rounded-full ${statusDot}`} />
-                                        <span className="text-[11px] font-medium tracking-[-0.32px] text-[#181925]">
+                                        <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">
                                           {order.status === "Delivered" ? t.delivered : order.status === "Processing" ? t.pending : t.failed}
                                         </span>
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-3.5 py-3 text-[11px] tracking-[-0.32px]">
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-3.5 py-3 text-[13px] tracking-[-0.32px]">
                                       <div>
                                         <p className="text-[#999999]">{t.from}</p>
                                         <p className="mt-0.5 font-medium text-[#181925]">{order.platform}</p>
@@ -921,7 +920,7 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                       </div>
                                     </div>
                                     <div className="border-t border-[rgba(0,0,0,0.06)] px-3.5 py-2.5">
-                                      <button className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[11px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
+                                      <button className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
                                         <RotateCcw className="size-3" strokeWidth={2} />
                                         {t.resendVia(order.delivery)}
                                       </button>
@@ -932,11 +931,11 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
 
                               <div className="flex flex-col gap-5 p-6">
                                 <div>
-                                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.licenseLabel}</p>
+                                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.licenseLabel}</p>
                                   <div className="mt-2.5 flex flex-col gap-1.5">
                                     <div className="flex items-center gap-2 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)] px-3 py-2">
                                       <span className={`size-1.5 shrink-0 rounded-full ${statusDot}`} />
-                                      <span className="flex-1 truncate font-mono text-[12px] tracking-[-0.32px] text-[#181925]">{order.keyCode}</span>
+                                      <span className="flex-1 truncate font-mono text-[13px] tracking-[-0.32px] text-[#181925]">{order.keyCode}</span>
                                       <button
                                         onClick={() => {
                                           navigator.clipboard.writeText(order.keyCode)
@@ -950,13 +949,13 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                     </div>
                                   </div>
                                   {order.keyCode.endsWith("0000") && (
-                                    <p className="mt-2 text-[11px] tracking-[-0.32px] text-[#E37400]">{"\u26A0"} {t.placeholderKeyWarning}</p>
+                                    <p className="mt-2 text-[13px] tracking-[-0.32px] text-[#E37400]">{"\u26A0"} {t.placeholderKeyWarning}</p>
                                   )}
                                   <div className="mt-2.5 flex gap-2">
-                                    <button className="inline-flex h-7 items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[11px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
+                                    <button className="inline-flex h-7 items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
                                       {t.reassignLicense}
                                     </button>
-                                    <button className="inline-flex h-7 items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[11px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
+                                    <button className="inline-flex h-7 items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">
                                       <RotateCcw className="size-3" strokeWidth={2} />
                                       {t.retry}
                                     </button>
@@ -966,12 +965,12 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                 <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                                 <div>
-                                  <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.dangerZone}</p>
+                                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.dangerZone}</p>
                                   <div className="mt-2.5 flex gap-2">
-                                    <button className="inline-flex h-8 items-center rounded-lg border border-[rgba(0,0,0,0.08)] px-3 text-[12px] font-medium tracking-[-0.32px] text-[#D93025] transition-colors hover:bg-[#D93025]/[0.04]">
+                                    <button className="inline-flex h-8 items-center rounded-lg border border-[rgba(0,0,0,0.08)] px-3 text-[13px] font-medium tracking-[-0.32px] text-[#D93025] transition-colors hover:bg-[#D93025]/[0.04]">
                                       {t.cancelOrder}
                                     </button>
-                                    <button className="inline-flex h-8 items-center rounded-lg bg-[#D93025] px-3 text-[12px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#c12b20]">
+                                    <button className="inline-flex h-8 items-center rounded-lg bg-[#D93025] px-3 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#c12b20]">
                                       {t.deleteOrder}
                                     </button>
                                   </div>
@@ -981,7 +980,7 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
 
                                 <Link
                                   to={locale === "kr" ? "/kr/dashboard/orders" : "/dashboard/orders"}
-                                  className="flex items-center justify-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-2 text-[12px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:bg-[#918DF6]/[0.06]"
+                                  className="flex items-center justify-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-2 text-[13px] font-medium tracking-[-0.32px] text-[#918DF6] transition-colors hover:bg-[#918DF6]/[0.06]"
                                 >
                                   <ExternalLink className="size-3.5" strokeWidth={2} />
                                   {t.viewInOrders}
@@ -1004,8 +1003,8 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                 return (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.licenseInventory}</p>
-                      <Link to={locale === "kr" ? "/kr/dashboard/licenses" : "/dashboard/licenses"} className="flex items-center gap-1.5 rounded-lg bg-[#918DF6] px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#7D79E8]">
+                      <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.licenseInventory}</p>
+                      <Link to={locale === "kr" ? "/kr/dashboard/licenses" : "/dashboard/licenses"} className="flex items-center gap-1.5 rounded-lg bg-[#918DF6] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#7D79E8]">
                         <Upload className="size-3" strokeWidth={2} />
                         {t.addKeys}
                       </Link>
@@ -1013,15 +1012,15 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
 
                     <div className="grid grid-cols-3 gap-3">
                       <div className="rounded-lg border border-[rgba(0,0,0,0.08)] p-2.5">
-                        <p className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.available}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.available}</p>
                         <p className="mt-0.5 text-[18px] font-bold tabular-nums tracking-[-0.32px] text-[#34A853]">{available}</p>
                       </div>
                       <div className="rounded-lg border border-[rgba(0,0,0,0.08)] p-2.5">
-                        <p className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.delivered}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.delivered}</p>
                         <p className="mt-0.5 text-[18px] font-bold tabular-nums tracking-[-0.32px] text-[#2C78FC]">{delivered}</p>
                       </div>
                       <div className="rounded-lg border border-[rgba(0,0,0,0.08)] p-2.5">
-                        <p className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.expired}</p>
+                        <p className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.expired}</p>
                         <p className="mt-0.5 text-[18px] font-bold tabular-nums tracking-[-0.32px] text-[#D93025]">{expired}</p>
                       </div>
                     </div>
@@ -1029,12 +1028,12 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                     <div className="h-px bg-[rgba(0,0,0,0.08)]" />
 
                     <div>
-                      <p className="mb-2 text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.sources}</p>
+                      <p className="mb-2 text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.sources}</p>
                       <div className="flex gap-2">
                         {["Manual Upload", "API Fetch", "Bulk Import"].map((src) => {
                           const count = licenses.filter((l) => l.source === src).length
                           return (
-                            <span key={src} className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.08)] px-2.5 py-1 text-[11px] font-medium tracking-[-0.32px] text-[#666666]">
+                            <span key={src} className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.08)] px-2.5 py-1 text-[13px] font-medium tracking-[-0.32px] text-[#666666]">
                               {getSourceLabel(src, t)}
                               <span className="tabular-nums text-[#999999]">{count}</span>
                             </span>
@@ -1052,21 +1051,21 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                           className="flex items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-2"
                         >
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <code className="text-[12px] tabular-nums tracking-[-0.32px] text-[#181925]">{maskCode(lic.code)}</code>
-                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${licenseStatusStyles[lic.status]}`}>
-                                {getLicenseStatusLabel(lic.status, t)}
-                              </span>
-                            </div>
-                            <div className="mt-0.5 flex items-center gap-2">
-                              <span className="rounded bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[10px] font-medium tracking-[-0.32px] text-[#666666]">
-                                {getLicenseTypeLabel(lic.type, t)}
-                              </span>
-                              <span className="text-[#CCCCCC]">·</span>
-                              <span className="text-[11px] tracking-[-0.32px] text-[#999999]">{getSourceLabel(lic.source, t)}</span>
-                              <span className="text-[#CCCCCC]">·</span>
-                              <span className="text-[11px] tabular-nums tracking-[-0.32px] text-[#999999]">{lic.addedDate}</span>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <code className="text-[13px] tabular-nums tracking-[-0.32px] text-[#181925]">{maskCode(lic.code)}</code>
+                            <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${licenseStatusStyles[lic.status]}`}>
+                              {getLicenseStatusLabel(lic.status, t)}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-2">
+                            <span className="rounded bg-[rgba(0,0,0,0.04)] px-1.5 py-0.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666]">
+                              {getLicenseTypeLabel(lic.type, t)}
+                            </span>
+                            <span className="text-[#CCCCCC]">·</span>
+                            <span className="text-[13px] tracking-[-0.32px] text-[#999999]">{getSourceLabel(lic.source, t)}</span>
+                            <span className="text-[#CCCCCC]">·</span>
+                            <span className="text-[13px] tabular-nums tracking-[-0.32px] text-[#999999]">{lic.addedDate}</span>
+                          </div>
                           </div>
                         </div>
                       ))}
@@ -1078,8 +1077,8 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
               {detailTab === "merchants" && (
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-semibold tracking-[-0.32px] text-[#999999]">{t.merchantPlatforms}</p>
-                    <button className="flex items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:text-[#181925]">
+                    <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.merchantPlatforms}</p>
+                    <button className="flex items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:text-[#181925]">
                       <RefreshCw className="size-3" strokeWidth={2} />
                       {t.syncAll}
                     </button>
@@ -1095,16 +1094,16 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
                               {badge && (
-                                <PlatformBadgeIcon badge={badge} size="size-7" />
+                                <PlatformBadgeIcon badge={badge} size="size-5" />
                               )}
                               <div>
-                                <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#181925]">{merchant.platform}</p>
+                                <p className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">{merchant.platform}</p>
                                 <div className="flex items-center gap-1">
                                   <Circle
                                     className={`size-2 ${merchant.connected ? "fill-[#34A853] text-[#34A853]" : "fill-[#D93025] text-[#D93025]"}`}
                                     strokeWidth={0}
                                   />
-                                  <span className={`text-[11px] font-medium tracking-[-0.32px] ${merchant.connected ? "text-[#34A853]" : "text-[#D93025]"}`}>
+                                  <span className={`text-[13px] font-medium tracking-[-0.32px] ${merchant.connected ? "text-[#34A853]" : "text-[#D93025]"}`}>
                                     {merchant.connected ? t.connected : t.disconnected}
                                   </span>
                                 </div>
@@ -1138,7 +1137,7 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                                 </>
                               )}
                               {!merchant.connected && (
-                                <button className="rounded-lg bg-[#918DF6] px-3 py-1 text-[11px] font-medium text-white transition-colors hover:bg-[#7D79E8]">
+                                <button className="rounded-lg bg-[#918DF6] px-3 py-1 text-[13px] font-medium text-white transition-colors hover:bg-[#7D79E8]">
                                   {t.connect}
                                 </button>
                               )}
@@ -1148,23 +1147,23 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
                           {merchant.connected && (
                             <div className="mt-2.5 flex flex-col gap-1.5 rounded-md bg-[rgba(0,0,0,0.02)] p-2.5">
                               <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.lastSync}</span>
-                                <span className="text-[11px] tabular-nums tracking-[-0.32px] text-[#666666]">
+                                <span className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.lastSync}</span>
+                                <span className="text-[13px] tabular-nums tracking-[-0.32px] text-[#666666]">
                                   {merchant.lastSync ?? t.never}
                                 </span>
                               </div>
                               {merchant.listingUrl && (
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.listing}</span>
-                                  <span className="flex items-center gap-1 text-[11px] tracking-[-0.32px] text-[#918DF6]">
+                                  <span className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.listing}</span>
+                                  <span className="flex items-center gap-1 text-[13px] tracking-[-0.32px] text-[#918DF6]">
                                     <ExternalLink className="size-3" strokeWidth={2} />
                                     {t.viewListing}
                                   </span>
                                 </div>
                               )}
                               <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-medium tracking-[-0.32px] text-[#999999]">{t.autoSync}</span>
-                                <span className="flex items-center gap-1 text-[11px] tracking-[-0.32px] text-[#666666]">
+                                <span className="text-[13px] font-medium tracking-[-0.32px] text-[#999999]">{t.autoSync}</span>
+                                <span className="flex items-center gap-1 text-[13px] tracking-[-0.32px] text-[#666666]">
                                   {merchant.autoSync ? <Eye className="size-3" strokeWidth={2} /> : <EyeOff className="size-3" strokeWidth={2} />}
                                   {merchant.autoSync ? t.enabled : t.disabled}
                                 </span>
@@ -1192,7 +1191,7 @@ export default function Products({ locale = "en" }: { locale?: Locale }) {
               <DialogHeader>
                 <div className="flex items-center gap-2.5">
                   {badge && (
-                    <PlatformBadgeIcon badge={badge} size="size-8" />
+                    <PlatformBadgeIcon badge={badge} size="size-6" />
                   )}
                   <div>
                     <DialogTitle className="text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">
