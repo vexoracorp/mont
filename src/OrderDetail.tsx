@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
-  Copy, Check, ChevronLeft, ChevronRight, ChevronDown,
+  Copy, Check, ChevronLeft, ChevronDown,
   RotateCcw, Send, X, Pencil, Loader2, Package, ShoppingCart, Megaphone,
+  Download, ExternalLink, Gift,
 } from "lucide-react"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -52,6 +53,11 @@ const translations = {
     pending: "Pending",
     failed: "Failed",
     resendVia: (ch: string) => `Resend via ${ch}`,
+    profit: "Profit",
+    qty: "Qty",
+    licenseFile: (n: number) => n > 1 ? `${n} Files` : "1 File",
+    licenseLink: (n: number) => n > 1 ? `${n} Links` : "1 Link",
+    licenseGiftCard: (n: number) => n > 1 ? `${n} Gift Cards` : "Gift Card",
     licenseLabel: "LICENSE",
     reassignLicense: "Reassign License",
     retry: "Retry",
@@ -174,6 +180,11 @@ const translations = {
     pending: "대기 중",
     failed: "실패",
     resendVia: (ch: string) => `${ch}로 재발송`,
+    profit: "수익",
+    qty: "수량",
+    licenseFile: (n: number) => n > 1 ? `파일 ${n}개` : "파일 1개",
+    licenseLink: (n: number) => n > 1 ? `링크 ${n}개` : "링크 1개",
+    licenseGiftCard: (n: number) => n > 1 ? `기프트카드 ${n}개` : "기프트카드",
     licenseLabel: "라이선스",
     reassignLicense: "라이선스 재할당",
     retry: "재시도",
@@ -349,6 +360,7 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
   const ch = deliveryChannels[order.delivery]
   const items = order.items ?? [{ keyCode: order.keyCode, status: order.status }]
   const qty = order.quantity ?? 1
+  const primaryItemType = items[0]?.type ?? "key"
   const statusDot = order.status === "Delivered" ? "bg-[#34A853]" : order.status === "Processing" ? "bg-[#E37400]" : "bg-[#D93025]"
   const rawJson = JSON.stringify(order, null, 2)
 
@@ -371,9 +383,9 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
   }
 
   const msgTypeConfig: Record<WorkflowMsgType, { label: string; labelKr: string; icon: React.ReactNode; color: string; bg: string }> = {
-    product: { label: "Product Delivery", labelKr: "제품 발송", icon: <Package className="size-3" strokeWidth={2} />, color: "#918DF6", bg: "rgba(145,141,246,0.12)" },
-    confirm: { label: "Confirm Purchase", labelKr: "구매확정 요청", icon: <ShoppingCart className="size-3" strokeWidth={2} />, color: "#1A73E8", bg: "rgba(26,115,232,0.10)" },
-    announcement: { label: "Announcement", labelKr: "공지", icon: <Megaphone className="size-3" strokeWidth={2} />, color: "#E37400", bg: "rgba(227,116,0,0.10)" },
+    product: { label: "Product Delivery", labelKr: "제품 발송", icon: <Package className="size-4" strokeWidth={2} />, color: "#918DF6", bg: "rgba(145,141,246,0.12)" },
+    confirm: { label: "Confirm Purchase", labelKr: "구매확정 요청", icon: <ShoppingCart className="size-4" strokeWidth={2} />, color: "#1A73E8", bg: "rgba(26,115,232,0.10)" },
+    announcement: { label: "Announcement", labelKr: "공지", icon: <Megaphone className="size-4" strokeWidth={2} />, color: "#E37400", bg: "rgba(227,116,0,0.10)" },
   }
 
   const mockWorkflowMessages: WorkflowMsg[] = [
@@ -382,38 +394,33 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
   ]
 
   const WorkflowMessagesSection = () => (
-    <div className="mb-5">
+    <div className="mb-6">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#999999]">{locale === "kr" ? "발송 메시지" : "Messages"}</p>
+        <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#666666]">{locale === "kr" ? "발송 메시지" : "Messages"}</p>
         <button
           onClick={() => { setSendMsgType(null); setSendMsgChannel(order.delivery); setSendMsgTarget(order.deliveryTarget || order.email || ""); setSendMsgContent(""); setSendMsgRunning(false); setSendMsgDone(null); setSendMsgOpen(true) }}
-          className="flex h-6 items-center gap-1 rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2 text-[11px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]"
+          className="flex h-7 items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]"
         >
-          <Send className="size-2.5" strokeWidth={2} />
+          <Send className="size-3" strokeWidth={2} />
           {locale === "kr" ? "보내기" : "Send"}
         </button>
       </div>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {mockWorkflowMessages.map((msg) => {
           const cfg = msgTypeConfig[msg.type]
-          const msgCh = deliveryChannels[msg.channel]
           return (
-            <div key={msg.id} className="flex items-start gap-2.5 rounded-lg border border-[rgba(0,0,0,0.07)] bg-[rgba(0,0,0,0.015)] px-3 py-2.5">
-              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md" style={{ backgroundColor: cfg.bg, color: cfg.color }}>
+            <div key={msg.id} className="flex items-start gap-3 rounded-xl border border-[rgba(0,0,0,0.07)] bg-[rgba(0,0,0,0.015)] px-4 py-3.5">
+              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: cfg.bg, color: cfg.color }}>
                 {cfg.icon}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#181925]">{locale === "kr" ? cfg.labelKr : cfg.label}</p>
-                  <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tracking-[-0.24px] ${msg.status === "sent" ? "bg-[#34A853]/10 text-[#34A853]" : msg.status === "failed" ? "bg-[#D93025]/10 text-[#D93025]" : "bg-[#E37400]/10 text-[#E37400]"}`}>
+                  <p className="text-[14px] font-semibold tracking-[-0.32px] text-[#181925]">{locale === "kr" ? cfg.labelKr : cfg.label}</p>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-[-0.24px] ${msg.status === "sent" ? "bg-[#34A853]/10 text-[#34A853]" : msg.status === "failed" ? "bg-[#D93025]/10 text-[#D93025]" : "bg-[#E37400]/10 text-[#E37400]"}`}>
                     {msg.status === "sent" ? (locale === "kr" ? "발송됨" : "Sent") : msg.status === "failed" ? (locale === "kr" ? "실패" : "Failed") : (locale === "kr" ? "대기" : "Pending")}
                   </span>
                 </div>
-                <div className="mt-1 flex items-center gap-1.5">
-                  {msgCh && <span className="shrink-0" style={{ color: msgCh.color }}>{msgCh.icon}</span>}
-                  <p className="truncate text-[11px] tracking-[-0.24px] text-[#999999]">{msg.target}</p>
-                </div>
-                <p className="mt-0.5 text-[11px] tracking-[-0.24px] text-[#bbbbbb]">{msg.time}</p>
+                <p className="mt-1.5 text-[12px] tracking-[-0.24px] text-[#999999]">{msg.time}</p>
               </div>
             </div>
           )
@@ -500,7 +507,8 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
 
   return (
     <DashboardLayout title={locale === "kr" ? "주문 상세" : "Order Detail"} locale={locale} currency={currency} onCurrencyToggle={() => setCurrency(currency === "USD" ? "KRW" : "USD")}>
-      <div className="flex flex-1 flex-col overflow-hidden px-5 pt-3 pb-3 lg:px-6">
+      <div className="flex flex-1 flex-col overflow-hidden px-5 pt-3 pb-3 lg:px-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate(locale === "kr" ? "/kr/dashboard/orders" : "/dashboard/orders")} className="flex items-center gap-1.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:text-[#181925]">
@@ -538,107 +546,115 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
 
         <div className="flex flex-1 gap-4 overflow-hidden lg:gap-5">
           <div className="flex flex-1 flex-col overflow-y-auto rounded-xl border border-[rgba(0,0,0,0.08)] bg-white" style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
-            <div className="bg-[rgba(0,0,0,0.02)] px-5 py-4">
-              <div className="flex items-stretch gap-0">
-                <button onClick={() => setSourcePopupOpen(true)} className="group flex min-w-0 flex-1 flex-col rounded-l-lg border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3.5 text-left transition-all hover:border-[#918DF6]/30 hover:bg-[#918DF6]/[0.02] hover:shadow-sm">
-                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.source}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    {pBadge && <PlatformBadgeIcon badge={pBadge} size="size-5" />}
-                    <span className="truncate text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.platform}</span>
-                  </div>
-                  <p className="mt-1 truncate text-[13px] tracking-[-0.32px] text-[#666666]">{order.storeName || order.platform}</p>
-                  <p className="mt-1 flex items-center gap-0.5 text-[11px] font-medium tracking-[-0.32px] text-[#918DF6]">{locale === "kr" ? "자세히" : "Details"}<ChevronRight className="size-3" strokeWidth={2.5} /></p>
-                </button>
-                <button onClick={() => setLicensePopupOpen(true)} className="group flex min-w-0 flex-1 flex-col border-y border-[rgba(0,0,0,0.08)] bg-white px-4 py-3.5 text-left transition-all hover:border-[#918DF6]/30 hover:bg-[#918DF6]/[0.02] hover:shadow-sm">
-                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.license}</p>
-                  <p className="mt-2 truncate font-mono text-[13px] tracking-[-0.32px] text-[#181925]">{qty > 1 ? t.licenses(qty) : (items[0]?.keyCode || order.keyCode)}</p>
-                  <p className="mt-1 truncate text-[12px] tracking-[-0.32px] text-[#666666]">{order.product}</p>
-                  <p className="mt-1 flex items-center gap-0.5 text-[11px] font-medium tracking-[-0.32px] text-[#918DF6]">{locale === "kr" ? "자세히" : "Details"}<ChevronRight className="size-3" strokeWidth={2.5} /></p>
-                </button>
-                <button onClick={() => setChannelExpanded(true)} className={`group flex min-w-0 flex-1 flex-col rounded-r-lg border px-4 py-3.5 text-left transition-all hover:shadow-sm ${order.status === "Failed" ? "border-[#D93025]/30 bg-[#D93025]/[0.03] hover:bg-[#D93025]/[0.06]" : "border-[rgba(0,0,0,0.08)] bg-white hover:border-[#918DF6]/30 hover:bg-[#918DF6]/[0.02]"}`}>
-                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.channel}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    {ch && <span style={{ color: ch.color }}>{ch.icon}</span>}
-                    <span className="truncate text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.delivery}</span>
+            {/* Inline info strip */}
+            <div className="flex items-center gap-0 border-b border-[rgba(0,0,0,0.08)]">
+              <button onClick={() => setSourcePopupOpen(true)} className="flex flex-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[rgba(0,0,0,0.02)]">
+                {pBadge && <PlatformBadgeIcon badge={pBadge} size="size-5" />}
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.source}</p>
+                  <p className="mt-0.5 truncate text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">{order.storeName || order.platform}</p>
+                </div>
+              </button>
+              <div className="h-10 w-px bg-[rgba(0,0,0,0.08)]" />
+              <button onClick={() => setLicensePopupOpen(true)} className="flex flex-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[rgba(0,0,0,0.02)]">
+                {primaryItemType === "file" && <Download className="size-5 shrink-0 text-[#666666]" strokeWidth={2} />}
+                {primaryItemType === "link" && <ExternalLink className="size-5 shrink-0 text-[#1A73E8]" strokeWidth={2} />}
+                {primaryItemType === "giftcard" && <Gift className="size-5 shrink-0 text-[#E37400]" strokeWidth={2} />}
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.license}</p>
+                  <p className={`mt-0.5 truncate text-[15px] font-semibold tracking-[-0.32px] text-[#181925] ${primaryItemType === "key" || primaryItemType === "giftcard" ? "font-mono" : ""}`}>
+                    {primaryItemType === "file"
+                      ? t.licenseFile(qty)
+                      : primaryItemType === "link"
+                      ? t.licenseLink(qty)
+                      : primaryItemType === "giftcard"
+                      ? t.licenseGiftCard(qty)
+                      : qty > 1 ? t.licenses(qty) : (items[0]?.keyCode || order.keyCode)}
+                  </p>
+                </div>
+              </button>
+              <div className="h-10 w-px bg-[rgba(0,0,0,0.08)]" />
+              <button onClick={() => setChannelExpanded(true)} className={`flex flex-1 items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[rgba(0,0,0,0.02)] ${order.status === "Failed" ? "bg-[#D93025]/[0.02]" : ""}`}>
+                {ch && <span className="shrink-0 text-xl" style={{ color: ch.color }}>{ch.icon}</span>}
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.channel}</p>
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    <p className="truncate text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">{order.deliveryTarget || order.delivery}</p>
                     <span className={`size-2 shrink-0 rounded-full ${statusDot}`} />
                   </div>
-                  <p className="mt-1 truncate text-[13px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || "—"}</p>
-                  {order.status === "Failed" && order.errorMessage && (
-                    <div className="mt-2 rounded-md border border-[#D93025]/15 bg-[#D93025]/[0.06] px-2.5 py-2">
-                      <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#D93025]">{order.errorStep}</p>
-                      <p className="mt-0.5 line-clamp-2 text-[12px] leading-relaxed tracking-[-0.32px] text-[#666666]">{order.errorMessage}</p>
-                    </div>
-                  )}
-                  <p className="mt-1 flex items-center gap-0.5 text-[11px] font-medium tracking-[-0.32px] text-[#918DF6]">{locale === "kr" ? "자세히" : "Details"}<ChevronRight className="size-3" strokeWidth={2.5} /></p>
-                </button>
-              </div>
+                </div>
+              </button>
             </div>
 
             <div className="flex flex-col gap-0 divide-y divide-[rgba(0,0,0,0.08)]">
               {/* Product summary */}
-              <div className="p-4">
+              <div className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.productLabel}</p>
-                    <p className="mt-1.5 text-[15px] font-medium tracking-[-0.32px] text-[#181925]">{order.product}</p>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.productLabel}</p>
+                    <p className="mt-2 text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">{order.product}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[13px] tracking-[-0.32px] text-[#999999]">{locale === "kr" ? "판매금액" : "Sale"}</p>
-                    <p className="text-[15px] font-semibold tabular-nums tracking-[-0.32px] text-[#181925]">{locale === "kr" ? formatKRW(order.amount) : formatUSD(order.amount)}</p>
+                    <p className="text-[12px] tracking-[-0.32px] text-[#999999]">{locale === "kr" ? "판매금액" : "Sale"}</p>
+                    <p className="text-[17px] font-bold tabular-nums tracking-[-0.32px] text-[#181925]">{locale === "kr" ? formatKRW(order.amount) : formatUSD(order.amount)}</p>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-4 text-[12px] tracking-[-0.32px] text-[#666666]">
-                  <span>Profit <span className="font-medium text-[#34A853]">{locale === "kr" ? formatKRW(order.amount * 0.3) : formatUSD(order.amount * 0.3)}</span></span>
-                  <span className="text-[rgba(0,0,0,0.15)]">|</span>
-                  <span>Qty: {qty}</span>
+                <div className="mt-3 flex items-center gap-4 text-[13px] tracking-[-0.32px] text-[#666666]">
+                  {order.amount > 0 && (
+                    <>
+                      <span>{t.profit} <span className="font-semibold text-[#34A853]">{locale === "kr" ? formatKRW(order.amount * 0.3) : formatUSD(order.amount * 0.3)}</span></span>
+                      <span className="text-[rgba(0,0,0,0.15)]">|</span>
+                    </>
+                  )}
+                  <span>{t.qty}: {qty}</span>
                 </div>
               </div>
 
               {/* Buyer */}
-              <div className="p-4">
+              <div className="p-5">
                 <div className="flex items-center justify-between">
-                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.buyer}</p>
-                  {!buyerEditing && <button onClick={() => setBuyerEditing(true)} className="text-[12px] font-medium tracking-[-0.32px] text-[#918DF6] hover:underline">{t.edit}</button>}
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.buyer}</p>
+                  {!buyerEditing && <button onClick={() => setBuyerEditing(true)} className="text-[13px] font-medium tracking-[-0.32px] text-[#918DF6] hover:underline">{t.edit}</button>}
                 </div>
                 {buyerEditing ? (
-                  <div className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2">
-                    <div><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.name}</p><input defaultValue={order.customer} className="mt-0.5 h-7 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2 text-[13px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
-                    <div><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.phone}</p><input defaultValue={order.phone || ""} className="mt-0.5 h-7 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2 text-[13px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
-                    <div className="col-span-2"><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.email}</p><input defaultValue={order.email} className="mt-0.5 h-7 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2 text-[13px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
-                    <div className="col-span-2 flex justify-end gap-2"><button onClick={() => setBuyerEditing(false)} className="h-7 rounded-lg px-2.5 text-[11px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.04)]">{t.cancel}</button><button onClick={() => setBuyerEditing(false)} className="h-7 rounded-lg bg-[#181925] px-2.5 text-[11px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#2a2b3a]">{t.save}</button></div>
+                  <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+                    <div><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.name}</p><input defaultValue={order.customer} className="mt-1 h-8 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2.5 text-[14px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
+                    <div><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.phone}</p><input defaultValue={order.phone || ""} className="mt-1 h-8 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2.5 text-[14px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
+                    <div className="col-span-2"><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.email}</p><input defaultValue={order.email} className="mt-1 h-8 w-full rounded-md border border-[rgba(0,0,0,0.12)] bg-white px-2.5 text-[14px] tracking-[-0.32px] text-[#181925] outline-none" /></div>
+                    <div className="col-span-2 flex justify-end gap-2"><button onClick={() => setBuyerEditing(false)} className="h-8 rounded-lg px-3 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.04)]">{t.cancel}</button><button onClick={() => setBuyerEditing(false)} className="h-8 rounded-lg bg-[#181925] px-3 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#2a2b3a]">{t.save}</button></div>
                   </div>
                 ) : (
-                  <div className="mt-2.5 grid grid-cols-3 gap-4">
-                    <div><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.name}</p><p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</p></div>
-                    <div><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.phone}</p><p className="mt-0.5 text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.phone || "—"}</p></div>
-                    <div><p className="text-[11px] tracking-[-0.32px] text-[#999999]">{t.email}</p><p className="mt-0.5 truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.email}</p></div>
+                  <div className="mt-3 grid grid-cols-3 gap-4">
+                    <div><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.name}</p><p className="mt-1 text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.customer}</p></div>
+                    <div><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.phone}</p><p className="mt-1 text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.phone || "—"}</p></div>
+                    <div><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.email}</p><p className="mt-1 truncate text-[14px] font-medium tracking-[-0.32px] text-[#181925]">{order.email}</p></div>
                   </div>
                 )}
               </div>
 
               {/* Delivery Details */}
-              <div className="p-4">
-                <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.deliveryDetails}</p>
-                <div className="mt-2.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.015)]">
-                  <div className="flex items-center gap-3 border-b border-[rgba(0,0,0,0.06)] px-4 py-3">
-                    {ch && <span className="text-lg" style={{ color: ch.color }}>{ch.icon}</span>}
+              <div className="p-5">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.deliveryDetails}</p>
+                <div className="mt-3 rounded-xl border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.015)]">
+                  <div className="flex items-center gap-3 border-b border-[rgba(0,0,0,0.06)] px-4 py-3.5">
+                    {ch && <span className="text-xl" style={{ color: ch.color }}>{ch.icon}</span>}
                     <div className="flex-1">
-                      <p className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">{order.delivery}</p>
-                      <p className="text-[13px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || "—"}</p>
+                      <p className="text-[16px] font-semibold tracking-[-0.32px] text-[#181925]">{order.delivery}</p>
+                      <p className="text-[14px] tracking-[-0.32px] text-[#666666]">{order.deliveryTarget || "—"}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.06)] bg-white px-2.5 py-1">
+                    <div className="flex items-center gap-1.5 rounded-full border border-[rgba(0,0,0,0.06)] bg-white px-3 py-1">
                       <span className={`size-2 rounded-full ${statusDot}`} />
-                      <span className="text-[12px] font-medium tracking-[-0.32px] text-[#181925]">{order.status === "Delivered" ? t.delivered : order.status === "Processing" ? t.pending : t.failed}</span>
+                      <span className="text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{order.status === "Delivered" ? t.delivered : order.status === "Processing" ? t.pending : t.failed}</span>
                     </div>
                   </div>
                   <div className="px-4 py-3">
-                    <p className="text-[13px] tracking-[-0.32px] text-[#666666]"><span className="font-medium text-[#181925]">{order.recipientName || order.customer}</span>{" · "}{order.time}{" · "}{order.storeName || order.platform}</p>
+                    <p className="text-[14px] tracking-[-0.32px] text-[#666666]"><span className="font-medium text-[#181925]">{order.recipientName || order.customer}</span>{" · "}{order.time}{" · "}{order.storeName || order.platform}</p>
                   </div>
                   {order.status === "Failed" && order.errorMessage && (
                     <div className="border-t border-[rgba(0,0,0,0.06)] px-4 py-3">
                       <div className="rounded-md border border-[#D93025]/15 bg-[#D93025]/[0.04] px-3 py-2.5">
-                        <p className="text-[12px] font-semibold tracking-[-0.32px] text-[#D93025]">{order.errorStep}</p>
-                        <p className="mt-1 text-[12px] leading-relaxed tracking-[-0.32px] text-[#666666]">{order.errorMessage}</p>
+                        <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#D93025]">{order.errorStep}</p>
+                        <p className="mt-1 text-[13px] leading-relaxed tracking-[-0.32px] text-[#666666]">{order.errorMessage}</p>
                       </div>
                     </div>
                   )}
@@ -649,41 +665,75 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
               </div>
 
               {/* License */}
-              <div className="p-4">
+              <div className="p-5">
                 <div className="flex items-center gap-2">
-                  <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.licenseLabel}</p>
-                  {qty > 1 && <span className="rounded-full bg-[rgba(0,0,0,0.06)] px-2 py-0.5 text-[11px] font-semibold tabular-nums tracking-[-0.32px] text-[#666666]">{qty}</span>}
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.licenseLabel}</p>
+                  {qty > 1 && <span className="rounded-full bg-[rgba(0,0,0,0.06)] px-2 py-0.5 text-[12px] font-semibold tabular-nums tracking-[-0.32px] text-[#666666]">{qty}</span>}
                 </div>
-                <div className="mt-2.5 flex flex-col gap-1.5">
-                  {items.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)] px-3 py-2">
-                      <span className={`size-1.5 shrink-0 rounded-full ${item.status === "Delivered" ? "bg-[#34A853]" : item.status === "Processing" ? "bg-[#E37400]" : "bg-[#D93025]"}`} />
-                      <span className="flex-1 truncate font-mono text-[12px] tracking-[-0.32px] text-[#181925]">{item.keyCode}</span>
-                      <button onClick={(event) => { event.stopPropagation(); handleCopyKey(item.keyCode, idx) }} className="flex size-6 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-[rgba(0,0,0,0.06)]">{copiedItemIdx === idx ? <Check className="size-3 text-[#34A853]" strokeWidth={2.5} /> : <Copy className="size-3 text-[#999999]" strokeWidth={2} />}</button>
-                    </div>
-                  ))}
+                <div className="mt-3 flex flex-col gap-2">
+                  {items.map((item, idx) => {
+                    const itemType = item.type ?? "key"
+                    const statusDotItem = item.status === "Delivered" ? "bg-[#34A853]" : item.status === "Processing" ? "bg-[#E37400]" : "bg-[#D93025]"
+                    if (itemType === "file") {
+                      return (
+                        <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)] px-3.5 py-2.5">
+                          <span className={`size-2 shrink-0 rounded-full ${statusDotItem}`} />
+                          <Download className="size-4 shrink-0 text-[#666666]" strokeWidth={2} />
+                          <span className="flex-1 truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{item.label || item.keyCode}</span>
+                          <button className="flex h-7 shrink-0 items-center gap-1 rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]"><Download className="size-3" strokeWidth={2} />{locale === "kr" ? "다운로드" : "Download"}</button>
+                        </div>
+                      )
+                    }
+                    if (itemType === "link") {
+                      return (
+                        <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)] px-3.5 py-2.5">
+                          <span className={`size-2 shrink-0 rounded-full ${statusDotItem}`} />
+                          <ExternalLink className="size-4 shrink-0 text-[#666666]" strokeWidth={2} />
+                          <span className="flex-1 truncate text-[13px] font-medium tracking-[-0.32px] text-[#181925]">{item.label || item.keyCode}</span>
+                          <a href={item.keyCode} target="_blank" rel="noreferrer" className="flex h-7 shrink-0 items-center gap-1 rounded-md border border-[rgba(0,0,0,0.08)] bg-white px-2.5 text-[12px] font-medium tracking-[-0.32px] text-[#1A73E8] transition-colors hover:bg-[rgba(26,115,232,0.04)]"><ExternalLink className="size-3" strokeWidth={2} />{locale === "kr" ? "열기" : "Open"}</a>
+                        </div>
+                      )
+                    }
+                    if (itemType === "giftcard") {
+                      return (
+                        <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-[rgba(255,180,0,0.25)] bg-[rgba(255,224,0,0.06)] px-3.5 py-2.5">
+                          <span className={`size-2 shrink-0 rounded-full ${statusDotItem}`} />
+                          <Gift className="size-4 shrink-0 text-[#E37400]" strokeWidth={2} />
+                          <span className="flex-1 truncate font-mono text-[13px] tracking-[-0.32px] text-[#181925]">{item.keyCode}</span>
+                          <button onClick={(event) => { event.stopPropagation(); handleCopyKey(item.keyCode, idx) }} className="flex size-7 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-[rgba(0,0,0,0.06)]">{copiedItemIdx === idx ? <Check className="size-3.5 text-[#34A853]" strokeWidth={2.5} /> : <Copy className="size-3.5 text-[#999999]" strokeWidth={2} />}</button>
+                        </div>
+                      )
+                    }
+                    return (
+                      <div key={idx} className="flex items-center gap-2.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-[rgba(0,0,0,0.02)] px-3.5 py-2.5">
+                        <span className={`size-2 shrink-0 rounded-full ${statusDotItem}`} />
+                        <span className="flex-1 truncate font-mono text-[13px] tracking-[-0.32px] text-[#181925]">{item.keyCode}</span>
+                        <button onClick={(event) => { event.stopPropagation(); handleCopyKey(item.keyCode, idx) }} className="flex size-7 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-[rgba(0,0,0,0.06)]">{copiedItemIdx === idx ? <Check className="size-3.5 text-[#34A853]" strokeWidth={2.5} /> : <Copy className="size-3.5 text-[#999999]" strokeWidth={2} />}</button>
+                      </div>
+                    )
+                  })}
                 </div>
-                {order.keyCode.endsWith("0000") && <p className="mt-2 text-[11px] tracking-[-0.32px] text-[#E37400]">{t.keyPlaceholderWarning}</p>}
+                {order.keyCode.endsWith("0000") && <p className="mt-2 text-[12px] tracking-[-0.32px] text-[#E37400]">{t.keyPlaceholderWarning}</p>}
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => { setReassignSelectedKey([]); setReassignRunning(false); setReassignDone(false); setReassignDialogOpen(true) }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">{t.reassignLicense}</button>
-                  <button onClick={() => { setRetryRunning(false); setRetryDone(false); setRetryDialogOpen(true) }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]"><RotateCcw className="size-3.5" strokeWidth={2} />{t.retry}</button>
+                  <button onClick={() => { setReassignSelectedKey([]); setReassignRunning(false); setReassignDone(false); setReassignDialogOpen(true) }} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]">{t.reassignLicense}</button>
+                  <button onClick={() => { setRetryRunning(false); setRetryDone(false); setRetryDialogOpen(true) }} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white px-3.5 text-[13px] font-medium tracking-[-0.32px] text-[#666666] transition-colors hover:bg-[rgba(0,0,0,0.03)]"><RotateCcw className="size-3.5" strokeWidth={2} />{t.retry}</button>
                 </div>
               </div>
 
               {/* Admin Memo */}
-              <div className="p-4">
-                <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.adminMemo}</p>
-                <textarea defaultValue={order.adminMemo || ""} placeholder={t.addNote} rows={memoFocused || (order.adminMemo && order.adminMemo.length > 0) ? 3 : 1} onFocus={() => setMemoFocused(true)} onBlur={() => setMemoFocused(false)} onChange={handleMemoChange} className="mt-2 w-full resize-none rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 py-2 text-[12px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none transition-all" />
-                <div className="mt-1 flex items-center gap-1.5">
-                  {memoSaveStatus === "saving" && <div className="flex items-center gap-1"><Loader2 className="size-3 animate-spin text-[#999999]" strokeWidth={2} /><p className="text-[10px] tracking-[-0.32px] text-[#999999]">{t.saving}</p></div>}
-                  {memoSaveStatus === "saved" && <div className="flex items-center gap-1"><Check className="size-3 text-[#34A853]" strokeWidth={2.5} /><p className="text-[10px] tracking-[-0.32px] text-[#34A853]">{t.autoSaved}</p></div>}
-                  {memoSaveStatus === "idle" && <p className="text-[10px] tracking-[-0.32px] text-[#999999]">{t.autoSave}</p>}
+              <div className="p-5">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.adminMemo}</p>
+                <textarea defaultValue={order.adminMemo || ""} placeholder={t.addNote} rows={memoFocused || (order.adminMemo && order.adminMemo.length > 0) ? 3 : 1} onFocus={() => setMemoFocused(true)} onBlur={() => setMemoFocused(false)} onChange={handleMemoChange} className="mt-2 w-full resize-none rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 py-2.5 text-[13px] tracking-[-0.32px] text-[#181925] placeholder:text-[#999999] outline-none transition-all" />
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  {memoSaveStatus === "saving" && <div className="flex items-center gap-1"><Loader2 className="size-3 animate-spin text-[#999999]" strokeWidth={2} /><p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.saving}</p></div>}
+                  {memoSaveStatus === "saved" && <div className="flex items-center gap-1"><Check className="size-3 text-[#34A853]" strokeWidth={2.5} /><p className="text-[12px] tracking-[-0.32px] text-[#34A853]">{t.autoSaved}</p></div>}
+                  {memoSaveStatus === "idle" && <p className="text-[12px] tracking-[-0.32px] text-[#999999]">{t.autoSave}</p>}
                 </div>
               </div>
 
               {/* Danger Zone */}
-              <div className="p-4">
-                <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#999999]">{t.dangerZone}</p>
+              <div className="p-5">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-[#999999]">{t.dangerZone}</p>
                 <div className="mt-3 flex gap-2">
                   <button className="inline-flex h-9 items-center rounded-lg border border-[rgba(0,0,0,0.08)] px-4 text-[13px] font-medium tracking-[-0.32px] text-[#D93025] transition-colors hover:bg-[#D93025]/[0.04]">{t.cancelOrder}</button>
                   <button className="inline-flex h-9 items-center rounded-lg bg-[#D93025] px-4 text-[13px] font-medium tracking-[-0.32px] text-white transition-colors hover:bg-[#c12b20]">{t.deleteOrder}</button>
@@ -692,14 +742,14 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
             </div>
           </div>
 
-          <div className="hidden lg:flex w-[300px] shrink-0 flex-col overflow-y-auto rounded-xl border border-[rgba(0,0,0,0.08)] bg-white" style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
-            <div className="border-b border-[rgba(0,0,0,0.08)] px-5 py-3.5">
-              <p className="text-[13px] font-semibold tracking-[-0.32px] text-[#181925]">{locale === "kr" ? "활동" : "Activity"}</p>
+          <div className="hidden lg:flex w-[340px] shrink-0 flex-col overflow-y-auto rounded-xl border border-[rgba(0,0,0,0.08)] bg-white" style={{ boxShadow: "0 1px 1px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
+            <div className="border-b border-[rgba(0,0,0,0.08)] px-5 py-4">
+              <p className="text-[15px] font-semibold tracking-[-0.32px] text-[#181925]">{locale === "kr" ? "활동" : "Activity"}</p>
             </div>
             <div className="flex-1 overflow-y-auto p-5">
               <WorkflowMessagesSection />
               <div className="mb-5 border-t border-[rgba(0,0,0,0.06)]" />
-              <p className="mb-3 text-[12px] font-semibold tracking-[-0.32px] text-[#999999]">{locale === "kr" ? "타임라인" : "Timeline"}</p>
+              <p className="mb-3 text-[13px] font-semibold tracking-[-0.32px] text-[#666666]">{locale === "kr" ? "타임라인" : "Timeline"}</p>
               <TimelineContent />
               <RawDataSection />
             </div>
@@ -714,6 +764,7 @@ export default function OrderDetail({ locale = "en" }: { locale?: Locale }) {
           <TimelineContent />
           <RawDataSection />
         </div>
+      </div>
       </div>
 
       <Dialog open={sourcePopupOpen} onOpenChange={(open) => { if (!open) setSourcePopupOpen(false) }}>

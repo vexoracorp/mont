@@ -28,3 +28,6 @@ dist-ssr
 .spec-graph/graph.db-wal
 .spec-graph/graph.db-shm
 .spec-graph/.lock
+
+# ace governor — runtime session data
+.ace/
